@@ -249,6 +249,8 @@ export const AudioDetailView = memo(function AudioDetailView({ audioId }: AudioD
     const [titleInput, setTitleInput] = useState("");
     const [savingTitle, setSavingTitle] = useState(false);
     const [audioCollapsed, setAudioCollapsed] = useState(false);
+    const [existingSummary, setExistingSummary] = useState<string | null>(null);
+    const [summaryCollapsed, setSummaryCollapsed] = useState(false);
 
     // Execution info state
     const [executionInfoOpen, setExecutionInfoOpen] = useState(false);
@@ -275,6 +277,7 @@ export const AudioDetailView = memo(function AudioDetailView({ audioId }: AudioD
 useEffect(() => {
     fetchAudioDetails();
         fetchNotes();
+        fetchExistingSummary();
         // Check LLM configured status for gating
         (async () => {
             try {
@@ -703,6 +706,21 @@ useEffect(() => {
         } catch (e) { console.error("Failed to fetch notes", e); }
     };
 
+    const fetchExistingSummary = async () => {
+        try {
+            const res = await fetch(`/api/v1/transcription/${audioId}/summary`, { headers: { ...getAuthHeaders() }});
+            if (res.ok) {
+                const data = await res.json();
+                setExistingSummary(data.content || null);
+            } else {
+                setExistingSummary(null);
+            }
+        } catch (e) { 
+            console.error("Failed to fetch existing summary", e);
+            setExistingSummary(null);
+        }
+    };
+
     const fetchExecutionData = async () => {
         if (executionData) return; // Already loaded
         setExecutionDataLoading(true);
@@ -1058,6 +1076,9 @@ useEffect(() => {
             if (!receivedAny) {
                 setSummaryError('No content returned by the model.');
                 toast({ title: 'Summary failed', description: 'No content returned by the model.' });
+            } else {
+                // Refresh the existing summary after successful generation
+                await fetchExistingSummary();
             }
         } catch (e) {
             setSummaryError('Summary generation failed. Please try again.');
@@ -1761,6 +1782,42 @@ useEffect(() => {
 						</div>
 
 					)}
+
+				{/* Summary Section - Only show if summary exists and transcript is completed */}
+				{(currentStatus || audioFile.status) === "completed" && existingSummary && (
+					<div className="bg-white dark:bg-gray-800 rounded-xl p-3 sm:p-6 mt-3 sm:mt-6">
+						<div className="mb-3 sm:mb-6">
+							<div className="flex items-center justify-between">
+								<h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-50 flex items-center gap-2">
+									<Sparkles className="h-5 w-5 text-purple-500" />
+									Summary
+								</h2>
+								<button
+									className="h-7 w-7 inline-flex items-center justify-center rounded-md cursor-pointer text-gray-500 hover:text-gray-700 hover:bg-gray-200/60 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700/60 transition-colors"
+									aria-label={summaryCollapsed ? 'Expand summary' : 'Collapse summary'}
+									title={summaryCollapsed ? 'Expand summary' : 'Collapse summary'}
+									onClick={() => setSummaryCollapsed(v => !v)}
+								>
+									{summaryCollapsed ? (
+										<ChevronDown className="h-4 w-4" />
+									) : (
+										<ChevronUp className="h-4 w-4" />
+									)}
+								</button>
+							</div>
+						</div>
+						{!summaryCollapsed && (
+							<div className="prose prose-gray dark:prose-invert max-w-none">
+								<ReactMarkdown 
+									remarkPlugins={[remarkMath]} 
+									rehypePlugins={[rehypeRaw as any, rehypeKatex as any, rehypeHighlight as any]}
+								>
+									{existingSummary}
+								</ReactMarkdown>
+							</div>
+						)}
+					</div>
+				)}
 
 
 
