@@ -6,7 +6,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Upload, Mic, Settings, LogOut, Home, Plus, Grip, Zap, Youtube, Video, Users } from "lucide-react";
+import { Upload, Mic, Settings, LogOut, Home, Plus, Menu, Zap, Youtube, Video, Users } from "lucide-react";
 import { ScriberrLogo } from "./ScriberrLogo";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { AudioRecorder } from "./AudioRecorder";
@@ -212,7 +212,7 @@ export function Header({ onFileSelect, onMultiTrackClick, onDownloadComplete }: 
 								size="icon"
 								className="h-9 w-9 sm:h-10 sm:w-10 cursor-pointer"
 							>
-								<Grip className="h-5 w-5" />
+								<Menu className="h-5 w-5" />
 								<span className="sr-only">Open menu</span>
 							</Button>
 						</DropdownMenuTrigger>

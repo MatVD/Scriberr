@@ -42,6 +42,20 @@ func (suite *DatabaseTestSuite) TestDatabaseInitialization() {
 	_, err = os.Stat(testDbPath)
 	assert.NoError(suite.T(), err, "Database file should exist")
 
+	// Verify default profile was created
+	var profileCount int64
+	err = database.DB.Model(&models.TranscriptionProfile{}).Count(&profileCount).Error
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), int64(1), profileCount, "One default profile should be created")
+
+	// Verify the default profile has correct properties
+	var defaultProfile models.TranscriptionProfile
+	err = database.DB.Order("created_at ASC").First(&defaultProfile).Error
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), "Default Profile", defaultProfile.Name)
+	assert.NotNil(suite.T(), defaultProfile.Description)
+	assert.Equal(suite.T(), "base", defaultProfile.Parameters.Model)
+
 	// Close the test database and restore original
 	database.Close()
 	database.DB = originalDB

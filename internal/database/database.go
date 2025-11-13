@@ -83,7 +83,81 @@ func Initialize(dbPath string) error {
 		return fmt.Errorf("failed to create unique constraint for speaker mappings: %v", err)
 	}
 
+	// Create default transcription profile if none exists
+	if err := ensureDefaultProfile(); err != nil {
+		return fmt.Errorf("failed to create default profile: %v", err)
+	}
+
 	return nil
+}
+
+// ensureDefaultProfile creates a default transcription profile if no profiles exist
+func ensureDefaultProfile() error {
+	var count int64
+	if err := DB.Model(&models.TranscriptionProfile{}).Count(&count).Error; err != nil {
+		return fmt.Errorf("failed to count profiles: %v", err)
+	}
+
+	// If no profiles exist, create a default one
+	if count == 0 {
+		defaultProfile := models.TranscriptionProfile{
+			Name:        "Default Profile",
+			Description: stringPtr("Default transcription profile with balanced settings"),
+			IsDefault:   false, // Will be used as fallback automatically
+			Parameters: models.WhisperXParams{
+				ModelFamily:                    "whisper",
+				Model:                          "large",
+				ModelCacheOnly:                 false,
+				Device:                         "cpu",
+				DeviceIndex:                    0,
+				BatchSize:                      8,
+				ComputeType:                    "float32",
+				Threads:                        0,
+				OutputFormat:                   "all",
+				Verbose:                        true,
+				Task:                           "transcribe",
+				InterpolateMethod:              "nearest",
+				NoAlign:                        false,
+				ReturnCharAlignments:           false,
+				VadMethod:                      "pyannote",
+				VadOnset:                       0.5,
+				VadOffset:                      0.363,
+				ChunkSize:                      30,
+				Diarize:                        false,
+				DiarizeModel:                   "pyannote",
+				SpeakerEmbeddings:              false,
+				Temperature:                    0,
+				BestOf:                         5,
+				BeamSize:                       5,
+				Patience:                       1.0,
+				LengthPenalty:                  1.0,
+				SuppressNumerals:               false,
+				ConditionOnPreviousText:        false,
+				Fp16:                           true,
+				TemperatureIncrementOnFallback: 0.2,
+				CompressionRatioThreshold:      2.4,
+				LogprobThreshold:               -1.0,
+				NoSpeechThreshold:              0.6,
+				HighlightWords:                 false,
+				SegmentResolution:              "sentence",
+				PrintProgress:                  false,
+				AttentionContextLeft:           256,
+				AttentionContextRight:          256,
+				IsMultiTrackEnabled:            false,
+			},
+		}
+
+		if err := DB.Create(&defaultProfile).Error; err != nil {
+			return fmt.Errorf("failed to create default profile: %v", err)
+		}
+	}
+
+	return nil
+}
+
+// stringPtr returns a pointer to a string
+func stringPtr(s string) *string {
+	return &s
 }
 
 // Close closes the database connection gracefully

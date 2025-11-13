@@ -727,12 +727,9 @@ export const AudioFilesTable = memo(function AudioFilesTable({
 				cell: ({ row }) => {
 					const file = row.original;
 					return (
-						<button
-							onClick={() => handleAudioClick(file.id)}
-							className="text-gray-900 dark:text-gray-50 font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer text-left"
-						>
+						<span className="text-gray-900 dark:text-gray-50 font-medium">
 							{file.title || getFileName(file.audio_path)}
-						</button>
+						</span>
 					);
 				},
 				enableGlobalFilter: false,
@@ -803,7 +800,7 @@ export const AudioFilesTable = memo(function AudioFilesTable({
 				cell: ({ row }) => {
 					const file = row.original;
 					return (
-						<div className="text-center">
+						<div className="text-center" onClick={(e) => e.stopPropagation()}>
 							<Popover
 								open={openPopovers[file.id] || false}
 								onOpenChange={(open) =>
@@ -818,6 +815,7 @@ export const AudioFilesTable = memo(function AudioFilesTable({
 											variant="ghost"
 											size="sm"
 											className="h-8 w-8 sm:h-9 sm:w-9 p-0 cursor-pointer"
+											onClick={(e) => e.stopPropagation()}
 										>
 											<MoreVertical className="h-5 w-5" />
 										</Button>
@@ -907,7 +905,7 @@ export const AudioFilesTable = memo(function AudioFilesTable({
 				enableGlobalFilter: false,
 			},
 		],
-		[openPopovers, queuePositions, trackProgress, getStatusIcon, handleAudioClick, handleTranscribe, handleTranscribeD, canTranscribe, getFileName, killingJobs, setSelectedFile, setStopDialogOpen, setDeleteDialogOpen]
+		[openPopovers, getStatusIcon, handleTranscribe, handleTranscribeD, canTranscribe, getFileName, formatDate, navigate, killingJobs, setSelectedFile, setStopDialogOpen, setDeleteDialogOpen]
 	);
 
 	// Create the table instance with server-side pagination and search
@@ -1031,7 +1029,8 @@ export const AudioFilesTable = memo(function AudioFilesTable({
 										table.getRowModel().rows.map((row) => (
 											<TableRow
 												key={row.id}
-												className="hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 border-b border-gray-100 dark:border-gray-700 last:border-b-0"
+												onClick={() => handleAudioClick(row.original.id)}
+												className="hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 border-b border-gray-100 dark:border-gray-700 last:border-b-0 cursor-pointer"
 											>
 												{row.getVisibleCells().map((cell) => (
 													<TableCell

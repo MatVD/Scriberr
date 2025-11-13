@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, memo, useCallback } from "react";
 import { createPortal } from "react-dom";
-import { ArrowLeft, Play, Pause, List, AlignLeft, MessageCircle, Download, FileText, FileJson, FileImage, Check, StickyNote, Plus, X, Sparkles, Pencil, ChevronUp, ChevronDown, Info, Clock, Settings, Users, Loader2 } from "lucide-react";
+import { ArrowLeft, Play, Pause, List, AlignLeft, MessageCircle, Download, FileText, FileJson, FileImage, Check, StickyNote, Plus, X, Sparkles, Pencil, ChevronUp, ChevronRight, Info, Clock, Settings, Users, Loader2, Copy } from "lucide-react";
 import WaveSurfer from "wavesurfer.js";
 import { Button } from "./ui/button";
 import {
@@ -249,6 +249,9 @@ export const AudioDetailView = memo(function AudioDetailView({ audioId }: AudioD
     const [titleInput, setTitleInput] = useState("");
     const [savingTitle, setSavingTitle] = useState(false);
     const [audioCollapsed, setAudioCollapsed] = useState(false);
+    const [existingSummary, setExistingSummary] = useState<string | null>(null);
+    const [summaryCollapsed, setSummaryCollapsed] = useState(true);
+    const [transcriptCollapsed, setTranscriptCollapsed] = useState(true);
 
     // Execution info state
     const [executionInfoOpen, setExecutionInfoOpen] = useState(false);
@@ -275,6 +278,7 @@ export const AudioDetailView = memo(function AudioDetailView({ audioId }: AudioD
 useEffect(() => {
     fetchAudioDetails();
         fetchNotes();
+        fetchExistingSummary();
         // Check LLM configured status for gating
         (async () => {
             try {
@@ -703,6 +707,21 @@ useEffect(() => {
         } catch (e) { console.error("Failed to fetch notes", e); }
     };
 
+    const fetchExistingSummary = async () => {
+        try {
+            const res = await fetch(`/api/v1/transcription/${audioId}/summary`, { headers: { ...getAuthHeaders() }});
+            if (res.ok) {
+                const data = await res.json();
+                setExistingSummary(data.content || null);
+            } else {
+                setExistingSummary(null);
+            }
+        } catch (e) { 
+            console.error("Failed to fetch existing summary", e);
+            setExistingSummary(null);
+        }
+    };
+
     const fetchExecutionData = async () => {
         if (executionData) return; // Already loaded
         setExecutionDataLoading(true);
@@ -1058,6 +1077,9 @@ useEffect(() => {
             if (!receivedAny) {
                 setSummaryError('No content returned by the model.');
                 toast({ title: 'Summary failed', description: 'No content returned by the model.' });
+            } else {
+                // Refresh the existing summary after successful generation
+                await fetchExistingSummary();
             }
         } catch (e) {
             setSummaryError('Summary generation failed. Please try again.');
@@ -1215,6 +1237,37 @@ useEffect(() => {
 	const getFileNameWithoutExt = (): string => {
 		const name = audioFile?.title || getFileName(audioFile?.audio_path || '');
 		return name.replace(/\.[^/.]+$/, '') || 'transcript';
+	};
+
+	const downloadAudioFile = async () => {
+		try {
+			const response = await fetch(`/api/v1/transcription/${audioId}/audio`, {
+				method: 'GET',
+				headers: getAuthHeaders(),
+			});
+			
+			if (!response.ok) {
+				toast({ title: 'Failed to download audio file' });
+				return;
+			}
+
+			const blob = await response.blob();
+			const url = URL.createObjectURL(blob);
+			const link = document.createElement('a');
+			link.href = url;
+			
+			// Extract filename from audio_path or use a default
+			const originalFilename = audioFile?.audio_path ? getFileName(audioFile.audio_path) : 'audio-file.mp3';
+			link.download = originalFilename;
+			
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			URL.revokeObjectURL(url);
+		} catch (error) {
+			console.error('Error downloading audio:', error);
+			toast({ title: 'Failed to download audio file' });
+		}
 	};
 
 	const handleDownloadWithDialog = (format: 'txt' | 'json') => {
@@ -1399,15 +1452,43 @@ useEffect(() => {
 								onClick={toggleAudioCollapsed}
 							>
 								{audioCollapsed ? (
-									<ChevronDown className="h-4 w-4" />
+									<ChevronRight className="h-4 w-4" />
 								) : (
 									<ChevronUp className="h-4 w-4" />
 								)}
 							</button>
 						</div>
-						<p className="text-gray-600 dark:text-gray-400 text-sm">
-							Added on {formatDate(audioFile.created_at)}
-						</p>
+						<div className="flex items-center justify-between">
+							<p className="text-gray-600 dark:text-gray-400 text-sm">
+								Added on {formatDate(audioFile.created_at)}
+							</p>
+							<div className="flex items-center gap-2">
+								{/* Download Audio Button */}
+								<button
+									type="button"
+									onClick={downloadAudioFile}
+									className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors text-sm font-medium cursor-pointer"
+									title="Download audio file"
+								>
+									<Download className="h-4 w-4" />
+									Download Audio
+								</button>
+								
+								{/* Summarize Button - only when completed */}
+								{(currentStatus || audioFile.status) === "completed" && (
+									<button
+										type="button"
+										onClick={openSummarizeDialog}
+										className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+										title={llmReady === false ? 'Configure LLM in Settings' : 'Summarize transcript'}
+										disabled={llmReady === false}
+									>
+										<Sparkles className="h-4 w-4" />
+										Summarize
+									</button>
+								)}
+							</div>
+						</div>
 					</div>
 
 					{/* Audio Player Controls (hidden when collapsed, but kept mounted) */}
@@ -1442,15 +1523,41 @@ useEffect(() => {
 						{/* Header Section */}
 						<div className="mb-3 sm:mb-6">
 							{/* Title Row */}
-							<div className="flex items-center justify-between mb-3 sm:mb-0">
-								<h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-50">
-									{viewMode === "transcript" ? "Transcript" : "Chat with Transcript"}
+							<div className="flex items-center justify-between mb-3">
+								<h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-50 flex items-center gap-2">
+									{viewMode === "transcript" ? (
+										<>
+											<FileText className="h-5 w-5 text-blue-500" />
+											Transcript
+										</>
+									) : (
+										<>
+											<MessageCircle className="h-5 w-5 text-green-500" />
+											Chat with Transcript
+										</>
+									)}
 								</h2>
 
-								{/* Desktop: Show toolbar inline, Mobile: Hide here (shown below) */}
-								<div className="hidden sm:flex items-center gap-2">
-									{/* Sleek toolbar (desktop only) */}
-									{viewMode === 'transcript' && (
+								{/* Collapse button on the right */}
+								{viewMode === "transcript" && (
+									<button
+										className="h-7 w-7 inline-flex items-center justify-center rounded-md cursor-pointer text-gray-500 hover:text-gray-700 hover:bg-gray-200/60 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700/60 transition-colors"
+										aria-label={transcriptCollapsed ? 'Expand transcript' : 'Collapse transcript'}
+										title={transcriptCollapsed ? 'Expand transcript' : 'Collapse transcript'}
+										onClick={() => setTranscriptCollapsed(v => !v)}
+									>
+										{transcriptCollapsed ? (
+											<ChevronRight className="h-4 w-4" />
+										) : (
+											<ChevronUp className="h-4 w-4" />
+										)}
+									</button>
+								)}
+							</div>
+
+							{/* Action buttons below - only show when not collapsed and in transcript mode */}
+							{!transcriptCollapsed && viewMode === 'transcript' && (
+								<div className="flex items-center justify-end gap-2">
 									<div className="flex items-center gap-1 sm:gap-1.5 rounded-md sm:rounded-lg bg-gray-100/80 dark:bg-gray-800/80 px-1.5 py-0.5 sm:px-2 sm:py-1 border border-gray-200 dark:border-gray-700 shadow-sm">
                                 {/* View toggle */}
                                 <button
@@ -1564,132 +1671,13 @@ useEffect(() => {
                                   <MessageCircle className="h-4 w-4" />
                                 </button>
                             </div>
-                            )}
-								</div>
-							</div>
-
-							{/* Mobile: Centered toolbar below title */}
-							{viewMode === 'transcript' && (
-								<div className="flex sm:hidden justify-center">
-									<div className="flex items-center gap-1 rounded-md bg-gray-100/80 dark:bg-gray-800/80 px-1.5 py-0.5 border border-gray-200 dark:border-gray-700 shadow-sm">
-										{/* View toggle */}
-										<button
-											type="button"
-											onClick={() => setTranscriptMode(m => m === 'compact' ? 'expanded' : 'compact')}
-											className={`h-6 w-6 inline-flex items-center justify-center rounded-md cursor-pointer text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors ${transcriptMode === 'compact' ? 'bg-white dark:bg-gray-700 shadow-sm' : ''}`}
-											title={transcriptMode === 'compact' ? 'Switch to Timeline view' : 'Switch to Compact view'}
-										>
-											{transcriptMode === 'compact' ? (
-												<List className="h-3.5 w-3.5" />
-											) : (
-												<AlignLeft className="h-3.5 w-3.5" />
-											)}
-										</button>
-
-										<div className="mx-1 h-5 w-px bg-gray-300 dark:bg-gray-700" />
-
-										{/* Notes toggle */}
-										<button
-											type="button"
-											onClick={() => setNotesOpen(v => !v)}
-											className={`relative h-6 w-6 inline-flex items-center justify-center rounded-md cursor-pointer text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors ${notesOpen ? 'bg-white dark:bg-gray-700 shadow-sm' : ''}`}
-											title="Toggle notes"
-										>
-											<StickyNote className="h-3.5 w-3.5" />
-											{notes.length > 0 && (
-												<span className="absolute -top-1 -right-0.5 min-w-[15px] h-[15px] px-1 rounded-full bg-blue-600 text-white text-[10px] leading-[15px] text-center">
-													{notes.length > 99 ? '99+' : notes.length}
-												</span>
-											)}
-										</button>
-
-										<div className="mx-1 h-5 w-px bg-gray-300 dark:bg-gray-700" />
-
-										{/* Execution Info */}
-										<button
-											type="button"
-											onClick={openExecutionInfo}
-											className="h-6 w-6 inline-flex items-center justify-center rounded-md cursor-pointer text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-											title="View execution parameters and timing"
-										>
-											<Info className="h-3.5 w-3.5" />
-										</button>
-
-										{/* Speaker Renaming - only show if there are speakers (from diarization or multi-track) */}
-										{hasSpeakers() && getDetectedSpeakers().length > 0 && (
-											<>
-												<div className="mx-1 h-5 w-px bg-gray-300 dark:bg-gray-700" />
-												<button
-													type="button"
-													onClick={() => setSpeakerRenameDialogOpen(true)}
-													className="h-6 w-6 inline-flex items-center justify-center rounded-md cursor-pointer text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-													title="Rename speakers"
-												>
-													<Users className="h-3.5 w-3.5" />
-												</button>
-											</>
-										)}
-
-										<div className="mx-1 h-5 w-px bg-gray-300 dark:bg-gray-700" />
-
-										{/* Summarize */}
-										<button
-											type="button"
-											onClick={openSummarizeDialog}
-											className="h-6 w-6 inline-flex items-center justify-center rounded-md cursor-pointer text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
-											title={llmReady === false ? 'Configure LLM in Settings' : 'Summarize transcript'}
-											disabled={llmReady === false}
-										>
-											<Sparkles className="h-3.5 w-3.5" />
-										</button>
-
-										<div className="mx-1 h-5 w-px bg-gray-300 dark:bg-gray-700" />
-
-										{/* Download dropdown */}
-										<DropdownMenu>
-											<DropdownMenuTrigger asChild>
-												<button
-													type="button"
-													className="h-6 w-6 inline-flex items-center justify-center rounded-md cursor-pointer text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-													title="Download transcript"
-												>
-													<Download className="h-3.5 w-3.5" />
-												</button>
-											</DropdownMenuTrigger>
-											<DropdownMenuContent className="w-44 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-												<DropdownMenuItem onClick={downloadSRT} className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100">
-													<FileImage className="h-4 w-4" />
-													Download as SRT
-												</DropdownMenuItem>
-												<DropdownMenuItem onClick={() => handleDownloadWithDialog('txt')} className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100">
-													<FileText className="h-4 w-4" />
-													Download as TXT
-												</DropdownMenuItem>
-												<DropdownMenuItem onClick={() => handleDownloadWithDialog('json')} className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100">
-													<FileJson className="h-4 w-4" />
-													Download as JSON
-												</DropdownMenuItem>
-											</DropdownMenuContent>
-										</DropdownMenu>
-
-										<div className="mx-1 h-5 w-px bg-gray-300 dark:bg-gray-700" />
-
-										{/* Open Chat Page */}
-										<button
-											type="button"
-											onClick={() => navigate({ path: 'chat', params: { audioId } })}
-											className="h-6 w-6 inline-flex items-center justify-center rounded-md cursor-pointer text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-											title="Open chat"
-										>
-											<MessageCircle className="h-3.5 w-3.5" />
-										</button>
-									</div>
 								</div>
 							)}
 						</div>
 
 						{/* Content Area - Show transcript or chat based on view mode */}
 						{viewMode === "transcript" ? (
+							!transcriptCollapsed ? (
 							<div className="relative overflow-hidden">
 								<div
                                 className={`transition-all duration-300 ease-in-out ${
@@ -1750,6 +1738,7 @@ useEffect(() => {
 									)}
 								</div>
 							</div>
+							) : null
 						) : (
 							<div style={{ height: "600px" }}>
 								<ChatInterface 
@@ -1761,6 +1750,73 @@ useEffect(() => {
 						</div>
 
 					)}
+
+				{/* Summary Section - Only show if summary exists and transcript is completed */}
+				{(currentStatus || audioFile.status) === "completed" && existingSummary && (
+					<div className="bg-white dark:bg-gray-800 rounded-xl p-3 sm:p-6 mt-3 sm:mt-6">
+						<div className="mb-3 sm:mb-6">
+							<div className="flex items-center justify-between mb-3">
+								<h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-50 flex items-center gap-2">
+									<Sparkles className="h-5 w-5 text-purple-500" />
+									Summary
+								</h2>
+								<button
+									className="h-7 w-7 inline-flex items-center justify-center rounded-md cursor-pointer text-gray-500 hover:text-gray-700 hover:bg-gray-200/60 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700/60 transition-colors"
+									aria-label={summaryCollapsed ? 'Expand summary' : 'Collapse summary'}
+									title={summaryCollapsed ? 'Expand summary' : 'Collapse summary'}
+									onClick={() => setSummaryCollapsed(v => !v)}
+								>
+									{summaryCollapsed ? (
+										<ChevronRight className="h-4 w-4" />
+									) : (
+										<ChevronUp className="h-4 w-4" />
+									)}
+								</button>
+							</div>
+							{!summaryCollapsed && (
+								<div className="flex items-center justify-end gap-2">
+									<button
+										className="px-2.5 py-1.5 rounded-md bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-sm flex items-center gap-1.5 transition-colors cursor-pointer"
+										onClick={async () => {
+											try {
+												await navigator.clipboard.writeText(existingSummary || '');
+												toast({ title: 'Copied to clipboard' });
+											} catch {
+												toast({ title: 'Failed to copy' });
+											}
+										}}
+										title="Copy summary to clipboard"
+									>
+										<Copy className="h-3.5 w-3.5" />
+										Copy
+									</button>
+									<button
+										className="px-2.5 py-1.5 rounded-md bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-sm flex items-center gap-1.5 transition-colors cursor-pointer"
+										onClick={() => {
+											if (!existingSummary) return;
+											const base = getFileNameWithoutExt();
+											downloadFile(existingSummary, `${base}-summary.md`, 'text/markdown');
+										}}
+										title="Download summary as Markdown"
+									>
+										<Download className="h-3.5 w-3.5" />
+										Download .md
+									</button>
+								</div>
+							)}
+						</div>
+						{!summaryCollapsed && (
+							<div className="prose prose-gray dark:prose-invert max-w-none">
+								<ReactMarkdown 
+									remarkPlugins={[remarkMath]} 
+									rehypePlugins={[rehypeRaw as any, rehypeKatex as any, rehypeHighlight as any]}
+								>
+									{existingSummary}
+								</ReactMarkdown>
+							</div>
+						)}
+					</div>
+				)}
 
 
 
