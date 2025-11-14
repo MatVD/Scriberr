@@ -115,6 +115,40 @@ func (h *Handler) GetChatModels(c *gin.Context) {
 	c.JSON(http.StatusOK, ChatModelsResponse{Models: models})
 }
 
+// replaceSpeakerLabels replaces speaker labels (e.g., "SPEAKER_00", "speaker_00") in the transcript
+// with custom speaker names from the speaker_mappings table
+func replaceSpeakerLabels(transcriptionID string, transcript string) string {
+	// Fetch speaker mappings for this transcription
+	var mappings []models.SpeakerMapping
+	if err := database.DB.Where("transcription_job_id = ?", transcriptionID).Find(&mappings).Error; err != nil {
+		// If no mappings found or error, return original transcript
+		return transcript
+	}
+
+	// If no mappings, return original
+	if len(mappings) == 0 {
+		return transcript
+	}
+
+	// Replace each speaker label with custom name
+	result := transcript
+	for _, mapping := range mappings {
+		// Replace all variations of the speaker label
+		// Handle "SPEAKER_00:", "speaker_00:", "SPEAKER_00 ", etc.
+		original := mapping.OriginalSpeaker
+		custom := mapping.CustomName
+		
+		// Replace with colon (most common in transcripts)
+		result = strings.ReplaceAll(result, original+":", custom+":")
+		// Replace standalone occurrences with space after
+		result = strings.ReplaceAll(result, original+" ", custom+" ")
+		// Replace at end of line
+		result = strings.ReplaceAll(result, original+"\n", custom+"\n")
+	}
+
+	return result
+}
+
 // @Summary Create a new chat session
 // @Description Create a new chat session for a transcription
 // @Tags chat
@@ -429,7 +463,9 @@ func (h *Handler) SendChatMessage(c *gin.Context) {
 
 	// Add system message with transcript context
 	if session.Transcription.Transcript != nil {
-		systemContent := fmt.Sprintf("You are a helpful assistant analyzing this transcript. Please answer questions and provide insights based on the following transcript:\n\n%s", *session.Transcription.Transcript)
+		// Replace speaker labels with custom names if available
+		transcriptText := replaceSpeakerLabels(session.TranscriptionID, *session.Transcription.Transcript)
+		systemContent := fmt.Sprintf("You are a helpful assistant analyzing this transcript. Please answer questions and provide insights based on the following transcript:\n\n%s", transcriptText)
 		openaiMessages = append(openaiMessages, llm.ChatMessage{
 			Role:    "system",
 			Content: systemContent,

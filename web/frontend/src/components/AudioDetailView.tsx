@@ -971,7 +971,14 @@ useEffect(() => {
     const getFullTranscriptText = (): string => {
         if (!transcript) return '';
         if (transcript.segments && transcript.segments.length > 0) {
-            return transcript.segments.map(s => s.text.trim()).join('\n');
+            return transcript.segments.map(s => {
+                const text = s.text.trim();
+                // Include speaker name if available (for diarization or multi-track)
+                if (s.speaker) {
+                    return `${getDisplaySpeakerName(s.speaker)}: ${text}`;
+                }
+                return text;
+            }).join('\n');
         }
         return transcript.text || '';
     };
