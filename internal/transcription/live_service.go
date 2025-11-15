@@ -465,8 +465,7 @@ func (s *LiveTranscriptionService) convertToWav(inputPath, outputPath string) er
 		return fmt.Errorf("input file too small (%d bytes), likely corrupted", info.Size())
 	}
 
-	// MediaRecorder creates fragmented WebM - only first chunk has headers.
-	// Try direct conversion first, if it fails, use concat demuxer to reassemble.
+	// With stop/start cycling, each chunk should be a complete WebM container
 	cmd := exec.Command("ffmpeg",
 		"-y",
 		"-i", inputPath,
@@ -475,34 +474,9 @@ func (s *LiveTranscriptionService) convertToWav(inputPath, outputPath string) er
 		"-c:a", "pcm_s16le",
 		outputPath,
 	)
-	out, err := cmd.CombinedOutput()
-	if err == nil {
-		return nil // Success
+	if out, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("ffmpeg convert failed: %v (%s)", err, string(out))
 	}
-
-	// If direct conversion failed, try with concat protocol for fragmented WebM
-	logger.Info("Direct conversion failed, attempting fragmented WebM recovery",
-		"path", inputPath,
-		"error", string(out))
-
-	// Use pipe protocol to allow ffmpeg to handle fragmented stream
-	recoverCmd := exec.Command("ffmpeg",
-		"-y",
-		"-fflags", "+genpts", // Generate presentation timestamps
-		"-analyzeduration", "10M",
-		"-probesize", "10M",
-		"-i", inputPath,
-		"-ar", "16000",
-		"-ac", "1",
-		"-c:a", "pcm_s16le",
-		outputPath,
-	)
-	recoverOut, recoverErr := recoverCmd.CombinedOutput()
-	if recoverErr != nil {
-		return fmt.Errorf("ffmpeg convert failed (both direct and recovery): %v\nDirect: %s\nRecovery: %s",
-			recoverErr, string(out), string(recoverOut))
-	}
-
 	return nil
 }
 

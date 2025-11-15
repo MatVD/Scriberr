@@ -74,6 +74,7 @@ export function LiveTranscriptionDialog({ isOpen, onClose }: LiveTranscriptionDi
       }
       mediaRecorderRef.current.ondataavailable = null;
       mediaRecorderRef.current.onerror = null;
+      mediaRecorderRef.current.onstop = null;
       mediaRecorderRef.current = null;
     }
     if (mediaStreamRef.current) {
@@ -353,6 +354,10 @@ export function LiveTranscriptionDialog({ isOpen, onClose }: LiveTranscriptionDi
     if (!session) return;
     setPendingAction('finalize');
     stopRecorder();
+    
+    // Wait for all pending uploads to complete
+    await uploadPromiseRef.current;
+    
     try {
       const response = await fetch(`/api/v1/transcription/live/sessions/${session.id}/finalize`, {
         method: 'POST',
