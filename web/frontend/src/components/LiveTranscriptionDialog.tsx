@@ -6,11 +6,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from '@/contexts/RouterContext';
 import { useToast } from '@/components/ui/toast';
 import type { LiveSession, LiveStreamEvent } from '@/types/live';
-import { AlertCircle, ExternalLink, Pause, PlayCircle, Radio, StopCircle } from 'lucide-react';
+import { AlertCircle, Pause, PlayCircle, Radio, StopCircle } from 'lucide-react';
 
 interface LiveTranscriptionDialogProps {
   isOpen: boolean;
   onClose: () => void;
+  onSessionComplete?: () => void;
 }
 
 interface FinalizeResponse {
@@ -22,7 +23,7 @@ interface FinalizeResponse {
   };
 }
 
-export function LiveTranscriptionDialog({ isOpen, onClose }: LiveTranscriptionDialogProps) {
+export function LiveTranscriptionDialog({ isOpen, onClose, onSessionComplete }: LiveTranscriptionDialogProps) {
   const { getAuthHeaders } = useAuth();
   const { navigate } = useRouter();
   const { toast } = useToast();
@@ -389,6 +390,13 @@ export function LiveTranscriptionDialog({ isOpen, onClose }: LiveTranscriptionDi
       setSession(data.session);
       setFinalJobId(data.job.id);
       toast({ title: 'Final job queued', description: 'You can monitor progress from the Jobs table.' });
+      
+      // Trigger refresh and redirect to homepage after a short delay
+      onSessionComplete?.();
+      setTimeout(() => {
+        handleClose();
+        navigate({ path: 'home' });
+      }, 2000);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Could not finalize session';
       toast({ title: 'Finalize failed', description: message });
@@ -527,7 +535,7 @@ export function LiveTranscriptionDialog({ isOpen, onClose }: LiveTranscriptionDi
             </div>
           )}
 
-          {/* Final Job Link */}
+          {/* Final Job Link
           {finalJobId && (
             <div className="flex items-center justify-between rounded-lg border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20 p-3 text-sm">
               <div className="text-green-800 dark:text-green-200">
@@ -544,7 +552,7 @@ export function LiveTranscriptionDialog({ isOpen, onClose }: LiveTranscriptionDi
                 View job <ExternalLink className="h-4 w-4 ml-1" />
               </Button>
             </div>
-          )}
+          )} */}
 
           {/* Recording Controls */}
           <div className="flex justify-center gap-4">

@@ -299,6 +299,7 @@ export function Header({ onFileSelect, onMultiTrackClick, onDownloadComplete }: 
 			<LiveTranscriptionDialog
 				isOpen={isLiveTranscriptionOpen}
 				onClose={() => setIsLiveTranscriptionOpen(false)}
+				onSessionComplete={onDownloadComplete}
 			/>
 
 		</header>
