@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from '@/contexts/RouterContext';
 import { useToast } from '@/components/ui/toast';
-import type { LiveChunk, LiveSession, LiveStreamEvent } from '@/types/live';
+import type { LiveSession, LiveStreamEvent } from '@/types/live';
 import { AlertCircle, ExternalLink, Pause, PlayCircle, Radio, StopCircle } from 'lucide-react';
 
 interface LiveTranscriptionDialogProps {
@@ -29,7 +29,6 @@ export function LiveTranscriptionDialog({ isOpen, onClose }: LiveTranscriptionDi
 
   const [title, setTitle] = useState('');
   const [session, setSession] = useState<LiveSession | null>(null);
-  const [chunks, setChunks] = useState<LiveChunk[]>([]);
   const [isStarting, setIsStarting] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [streamError, setStreamError] = useState<string | null>(null);
@@ -54,7 +53,6 @@ export function LiveTranscriptionDialog({ isOpen, onClose }: LiveTranscriptionDi
     chunkSequenceRef.current = 0;
     startTimestampRef.current = null;
     lastChunkEndRef.current = 0;
-    setChunks([]);
     setSession(null);
     setStreamError(null);
     setFinalJobId(null);
@@ -212,16 +210,6 @@ export function LiveTranscriptionDialog({ isOpen, onClose }: LiveTranscriptionDi
       next.updated_at = event.timestamp;
       return next;
     });
-
-    if (event.type === 'snapshot' && event.chunks) {
-      setChunks(event.chunks);
-    }
-    if (event.type === 'chunk' && event.chunk) {
-      setChunks(prev => {
-        const filtered = prev.filter(chunk => chunk.sequence !== event.chunk!.sequence);
-        return [...filtered, event.chunk!].sort((a, b) => a.sequence - b.sequence);
-      });
-    }
   }, []);
 
   const connectStream = useCallback(async (sessionId: string) => {
@@ -416,12 +404,19 @@ export function LiveTranscriptionDialog({ isOpen, onClose }: LiveTranscriptionDi
 
   const hasSession = !!session;
 
-  const recordingTime = useMemo(() => {
-    if (!session) return 0;
-    const now = Date.now();
-    const start = new Date(session.created_at).getTime();
-    return now - start;
-  }, [session, chunks]); // Update when chunks arrive
+  const [recordingTime, setRecordingTime] = useState(0);
+
+  useEffect(() => {
+    if (!session || !isRecording) return;
+
+    const startTime = new Date(session.created_at).getTime();
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      setRecordingTime(elapsed);
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [session, isRecording]);
 
   const formatTime = (timeMs: number) => {
     const minutes = Math.floor(timeMs / 60000);
@@ -484,28 +479,23 @@ export function LiveTranscriptionDialog({ isOpen, onClose }: LiveTranscriptionDi
             </div>
           )}
 
-          {/* Visual Indicator (placeholder for waveform) */}
+          {/* Waveform Container */}
           {hasSession && (
             <div className="relative">
               <div className="w-full rounded-lg p-4 bg-gray-50 dark:bg-gray-800/50 min-h-[120px] flex items-center justify-center">
                 {isRecording ? (
-                  <div className="flex items-center gap-3">
-                    <div className="flex gap-1 items-end h-12">
-                      {[...Array(8)].map((_, i) => (
-                        <div
-                          key={i}
-                          className="w-2 bg-purple-500 rounded-full animate-pulse"
-                          style={{
-                            height: `${30 + Math.random() * 70}%`,
-                            animationDelay: `${i * 0.1}s`,
-                            animationDuration: '0.8s'
-                          }}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                      {chunks.length} chunk{chunks.length !== 1 ? 's' : ''} processed
-                    </span>
+                  <div className="flex items-center gap-1 h-16 justify-center">
+                    {[...Array(20)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="w-1 bg-purple-500 rounded-full"
+                        style={{
+                          height: '30%',
+                          animation: `waveform 0.6s ease-in-out infinite`,
+                          animationDelay: `${i * 0.05}s`,
+                        }}
+                      />
+                    ))}
                   </div>
                 ) : (
                   <div className="text-gray-400 dark:text-gray-500 text-sm text-center">
@@ -514,6 +504,12 @@ export function LiveTranscriptionDialog({ isOpen, onClose }: LiveTranscriptionDi
                   </div>
                 )}
               </div>
+              <style>{`
+                @keyframes waveform {
+                  0%, 100% { height: 2%; opacity: 0.3; }
+                  50% { height: 100%; opacity: 1; }
+                }
+              `}</style>
             </div>
           )}
 
@@ -586,7 +582,9 @@ export function LiveTranscriptionDialog({ isOpen, onClose }: LiveTranscriptionDi
                   onClick={finalizeSession}
                   disabled={pendingAction === 'finalize'}
                   size="lg"
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-xl font-medium transition-all duration-300 hover:scale-105"
+                  className={`bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-xl font-medium transition-all duration-300 ${
+                    pendingAction === 'finalize' ? 'animate-pulse' : 'hover:scale-105'
+                  }`}
                 >
                   {pendingAction === 'finalize' ? (
                     <>Finalizing...</>
