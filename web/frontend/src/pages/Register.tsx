@@ -3,7 +3,7 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
-import { ScriberrLogo } from "../components/ScriberrLogo";
+import { ScriberrLogo } from "../components/SyntheziaLogo";
 import { useRouter } from "../contexts/RouterContext";
 import { ThemeSwitcher } from "../components/ThemeSwitcher";
 import { Eye, EyeOff, Check, X } from "lucide-react";
