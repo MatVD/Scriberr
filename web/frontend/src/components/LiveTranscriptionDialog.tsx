@@ -136,9 +136,9 @@ export function LiveTranscriptionDialog({ isOpen, onClose, onSessionComplete }: 
   const cleanup = useCallback(async () => {
     await stopRecorder();
     disconnectStream();
-    await cancelRemoteSession();
+    // Don't cancel the session - user may reopen dialog to continue
     resetState();
-  }, [stopRecorder, disconnectStream, cancelRemoteSession, resetState]);
+  }, [stopRecorder, disconnectStream, resetState]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -362,6 +362,24 @@ export function LiveTranscriptionDialog({ isOpen, onClose, onSessionComplete }: 
       toast({ title: 'Failed to start live session', description: message });
     } finally {
       setIsStarting(false);
+    }
+  };
+
+  const cancelSession = async () => {
+    if (!session) return;
+    setPendingAction('cancel');
+    
+    try {
+      await stopRecorder();
+      await cancelRemoteSession();
+      toast({ title: 'Session cancelled' });
+      await cleanup();
+      onClose();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to cancel session';
+      toast({ title: 'Cancel failed', description: message });
+    } finally {
+      setPendingAction(null);
     }
   };
 
@@ -601,8 +619,20 @@ export function LiveTranscriptionDialog({ isOpen, onClose, onSessionComplete }: 
                 )}
 
                 <Button
+                  onClick={cancelSession}
+                  disabled={!!pendingAction}
+                  size="lg"
+                  variant="outline"
+                  className={`border-red-300 dark:border-red-600 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 px-6 py-3 rounded-xl ${
+                    pendingAction === 'cancel' ? 'animate-pulse' : ''
+                  }`}
+                >
+                  {pendingAction === 'cancel' ? <>Cancelling...</> : <>Cancel</>}
+                </Button>
+
+                <Button
                   onClick={finalizeSession}
-                  disabled={pendingAction === 'finalize'}
+                  disabled={!!pendingAction}
                   size="lg"
                   className={`bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-xl font-medium transition-all duration-300 ${
                     pendingAction === 'finalize' ? 'animate-pulse' : 'hover:scale-105'
