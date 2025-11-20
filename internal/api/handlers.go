@@ -2697,12 +2697,15 @@ func (h *Handler) DownloadFromYouTube(c *gin.Context) {
 	}
 
 	// Download audio using yt-dlp in Python environment
+	// Use extractor args to bypass bot detection and avoid requiring cookies
 	ytDlpCmd := exec.Command(h.config.UVPath, "run", "--native-tls", "--project", h.config.WhisperXEnv, "python", "-m", "yt_dlp",
 		"--extract-audio",
 		"--audio-format", "mp3",
 		"--audio-quality", "0", // best quality
 		"--output", filePath,
 		"--no-playlist",
+		"--extractor-args", "youtube:player_client=default,web",
+		"--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
 		req.URL,
 	)
 
