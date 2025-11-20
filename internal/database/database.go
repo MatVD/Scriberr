@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"scriberr/internal/models"
+	"synthezia/internal/models"
 
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"

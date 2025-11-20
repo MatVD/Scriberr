@@ -122,7 +122,7 @@ function Changelog() {
       <header className="api-topbar">
         <div className="container-narrow py-3 flex items-center justify-between gap-3">
           <a href="/" className="flex items-center gap-2 select-none">
-            <span className="logo-font-poiret text-lg text-gray-900">Scriberr</span>
+            <span className="logo-font-poiret text-lg text-gray-900">Synthezia</span>
             <span className="text-gray-300">/</span>
             <span className="text-sm text-gray-600">Changelog</span>
           </a>

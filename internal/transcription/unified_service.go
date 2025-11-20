@@ -12,12 +12,12 @@ import (
 	"sync"
 	"time"
 
-	"scriberr/internal/database"
-	"scriberr/internal/models"
-	"scriberr/internal/transcription/interfaces"
-	"scriberr/internal/transcription/pipeline"
-	"scriberr/internal/transcription/registry"
-	"scriberr/pkg/logger"
+	"synthezia/internal/database"
+	"synthezia/internal/models"
+	"synthezia/internal/transcription/interfaces"
+	"synthezia/internal/transcription/pipeline"
+	"synthezia/internal/transcription/registry"
+	"synthezia/pkg/logger"
 
 	"github.com/google/uuid"
 )

@@ -1,7 +1,7 @@
 const gallery = [
-  { name: 'Transcript view', img: 'scriberr-transcript page.png' },
-  { name: 'Summaries', img: 'scriberr-summarize transcripts.png' },
-  { name: 'Notes', img: 'scriberr-annotate transcript and take notes.png' }
+  { name: 'Transcript view', img: 'synthezia-transcript page.png' },
+  { name: 'Summaries', img: 'synthezia-summarize transcripts.png' },
+  { name: 'Notes', img: 'synthezia-annotate transcript and take notes.png' }
 ];
 
 import Window from './Window';

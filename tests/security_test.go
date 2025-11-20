@@ -12,12 +12,12 @@ import (
 	"strings"
 	"testing"
 
-	"scriberr/internal/api"
-	"scriberr/internal/auth"
-	"scriberr/internal/config"
-	"scriberr/internal/database"
-	"scriberr/internal/queue"
-	"scriberr/internal/transcription"
+	"synthezia/internal/api"
+	"synthezia/internal/auth"
+	"synthezia/internal/config"
+	"synthezia/internal/database"
+	"synthezia/internal/queue"
+	"synthezia/internal/transcription"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -30,7 +30,8 @@ type SecurityTestSuite struct {
 	config                    *config.Config
 	authService               *auth.AuthService
 	taskQueue                 *queue.TaskQueue
-	whisperXService           *transcription.WhisperXService
+	unifiedProcessor          *transcription.UnifiedJobProcessor
+	liveTranscriptionService  *transcription.LiveTranscriptionService
 	quickTranscriptionService *transcription.QuickTranscriptionService
 	handler                   *api.Handler
 }
@@ -57,14 +58,21 @@ func (suite *SecurityTestSuite) SetupSuite() {
 
 	// Initialize services
 	suite.authService = auth.NewAuthService(suite.config.JWTSecret)
-	suite.whisperXService = transcription.NewWhisperXService(suite.config)
+	suite.unifiedProcessor = transcription.NewUnifiedJobProcessor()
+	
 	var err error
-	suite.quickTranscriptionService, err = transcription.NewQuickTranscriptionService(suite.config, suite.whisperXService)
+	suite.liveTranscriptionService, err = transcription.NewLiveTranscriptionService(suite.config, suite.unifiedProcessor.GetUnifiedService())
+	if err != nil {
+		suite.T().Fatal("Failed to initialize live transcription service:", err)
+	}
+
+	suite.quickTranscriptionService, err = transcription.NewQuickTranscriptionService(suite.config, suite.unifiedProcessor)
 	if err != nil {
 		suite.T().Fatal("Failed to initialize quick transcription service:", err)
 	}
-	suite.taskQueue = queue.NewTaskQueue(1, suite.whisperXService)
-	suite.handler = api.NewHandler(suite.config, suite.authService, suite.taskQueue, suite.whisperXService, suite.quickTranscriptionService)
+	
+	suite.taskQueue = queue.NewTaskQueue(1, suite.unifiedProcessor)
+	suite.handler = api.NewHandler(suite.config, suite.authService, suite.taskQueue, suite.unifiedProcessor, suite.liveTranscriptionService, suite.quickTranscriptionService)
 
 	// Set up router
 	suite.router = api.SetupRoutes(suite.handler, suite.authService)

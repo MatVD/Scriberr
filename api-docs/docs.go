@@ -3809,7 +3809,7 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:8080",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
-	Title:            "Scriberr API",
+	Title:            "Synthezia API",
 	Description:      "Audio transcription service using WhisperX",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,

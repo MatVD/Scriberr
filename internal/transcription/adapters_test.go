@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"scriberr/internal/models"
-	"scriberr/internal/transcription/interfaces"
-	"scriberr/internal/transcription/registry"
+	"synthezia/internal/models"
+	"synthezia/internal/transcription/interfaces"
+	"synthezia/internal/transcription/registry"
 )
 
 func TestModelRegistry(t *testing.T) {

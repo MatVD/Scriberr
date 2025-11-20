@@ -25,9 +25,9 @@ vite.config.ts.timestamp-*
 .env
 .env
 samples
-scriberr
+synthezia
 data
-data/scriberr.db
+data/synthezia.db
 data/transcripts
 data/uploads
 data/whisperx-env/test
@@ -36,7 +36,7 @@ web/landing_bak
 CLAUDE.md
 AGENTS.md
 .env.example
-scriberr-data
+synthezia-data
 whisperx-env
 
 internal/web
@@ -47,6 +47,6 @@ server
 test_word_conversion.go
 debug_whisperx_parsing.go
 debug_parsing.go
-scriberr-optimized
+synthezia-optimized
 tests/database_test.db-shm
 tests

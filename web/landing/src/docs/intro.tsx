@@ -9,16 +9,16 @@ function Introduction() {
     <DocsLayout active="intro">
       <header>
         <h1>Introduction</h1>
-        <p className="mt-2">A quick overview of Scriberr and what you can do with it.</p>
+        <p className="mt-2">A quick overview of Synthezia and what you can do with it.</p>
       </header>
 
       <article>
-        <h2>What is Scriberr?</h2>
+        <h2>What is Synthezia?</h2>
         <p className="mt-2">
-          Scriberr is a self-hosted, offline transcription app for converting audio files into text. Record or upload audio, get it transcribed, and quickly summarize or chat using your preferred LLM provider. Scriberr doesn’t require GPUs (although GPUs can be used for acceleration) and runs on modern CPUs, offering a range of trade-offs between speed and transcription quality.
+          Synthezia is a self-hosted, offline transcription app for converting audio files into text. Record or upload audio, get it transcribed, and quickly summarize or chat using your preferred LLM provider. Synthezia doesn’t require GPUs (although GPUs can be used for acceleration) and runs on modern CPUs, offering a range of trade-offs between speed and transcription quality.
         </p>
         <p className="mt-2">
-          Scriberr is built with React on the frontend and Go on the backend, compiled into a single binary. It uses the WhisperX engine and open-source Whisper models for transcription. Some key features include:
+          Synthezia is built with React on the frontend and Go on the backend, compiled into a single binary. It uses the WhisperX engine and open-source Whisper models for transcription. Some key features include:
         </p>
         <ul className="mt-2 list-disc pl-5 space-y-1">
           <li>Fine-tune advanced transcription parameters for precise control over quality</li>
@@ -31,11 +31,11 @@ function Introduction() {
         </ul>
 
         <div className="mt-5">
-          <Window src="/screenshots/scriberr-homepage.png" alt="Scriberr homepage" />
+          <Window src="/screenshots/synthezia-homepage.png" alt="Synthezia homepage" />
         </div>
 
         <p className="mt-4">
-          To install Scriberr, check the <a href="/docs/installation.html">installation page</a> for setup instructions.
+          To install Synthezia, check the <a href="/docs/installation.html">installation page</a> for setup instructions.
         </p>
       </article>
     </DocsLayout>

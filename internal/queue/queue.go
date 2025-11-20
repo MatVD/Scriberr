@@ -12,9 +12,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"scriberr/internal/database"
-	"scriberr/internal/models"
-	"scriberr/pkg/logger"
+	"synthezia/internal/database"
+	"synthezia/internal/models"
+	"synthezia/pkg/logger"
 )
 
 // RunningJob tracks both context cancellation and OS process
@@ -145,6 +145,11 @@ func (tq *TaskQueue) Stop() {
 
 // EnqueueJob adds a job to the queue
 func (tq *TaskQueue) EnqueueJob(jobID string) error {
+	// Check if queue is stopped first to avoid panic on closed channel
+	if tq.ctx.Err() != nil {
+		return fmt.Errorf("queue is shutting down")
+	}
+
 	select {
 	case tq.jobChannel <- jobID:
 		return nil

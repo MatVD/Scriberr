@@ -9,8 +9,8 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
-	"scriberr/internal/database"
-	"scriberr/internal/models"
+	"synthezia/internal/database"
+	"synthezia/internal/models"
 )
 
 // NoteCreateRequest is the payload for creating a note

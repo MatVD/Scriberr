@@ -5,10 +5,10 @@ import (
 	"strings"
 	"testing"
 
-	"scriberr/internal/auth"
-	"scriberr/internal/config"
-	"scriberr/internal/database"
-	"scriberr/internal/models"
+	"synthezia/internal/auth"
+	"synthezia/internal/config"
+	"synthezia/internal/database"
+	"synthezia/internal/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"

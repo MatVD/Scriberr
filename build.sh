@@ -1,15 +1,15 @@
 #!/bin/bash
 
-# Scriberr Build Script
+# SynthezIA Build Script
 # This script builds the React frontend and embeds it in the Go binary
 
 set -e  # Exit on any error
 
-echo "🚀 Starting Scriberr build process..."
+echo "🚀 Starting SynthezIA build process..."
 
 # Step 1: Clean up old files
 echo "🧹 Cleaning up old build files..."
-rm -f scriberr
+rm -f synthezia
 rm -rf internal/web/dist
 cd web/frontend
 
@@ -34,7 +34,7 @@ echo "✅ Dist files copied to internal/web"
 # Step 4: Clean Go build cache and rebuild binary
 echo "🔨 Building Go binary with embedded static files..."
 go clean -cache
-go build -o scriberr cmd/server/main.go
+go build -o synthezia cmd/server/main.go
 echo "✅ Go binary built successfully"
 
-echo "🎉 Build complete! Run './scriberr' to start the server"
+echo "🎉 Build complete! Run './synthezia' to start the server"

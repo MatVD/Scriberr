@@ -9,8 +9,9 @@ import (
 	"strconv"
 	"strings"
 
+	"synthezia/pkg/logger"
+
 	"github.com/joho/godotenv"
-	"scriberr/pkg/logger"
 )
 
 // Config holds all configuration values
@@ -43,7 +44,7 @@ func Load() *Config {
 	return &Config{
 		Port:         getEnv("PORT", "8080"),
 		Host:         getEnv("HOST", "localhost"),
-		DatabasePath: getEnv("DATABASE_PATH", "data/scriberr.db"),
+		DatabasePath: getEnv("DATABASE_PATH", "data/synthezia.db"),
 		JWTSecret:    getJWTSecret(),
 		UploadDir:    getEnv("UPLOAD_DIR", "data/uploads"),
 		UVPath:       findUVPath(),

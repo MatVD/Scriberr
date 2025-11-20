@@ -9,9 +9,9 @@ import (
 	"sync"
 	"time"
 
-	"scriberr/internal/config"
-	"scriberr/internal/database"
-	"scriberr/internal/models"
+	"synthezia/internal/config"
+	"synthezia/internal/database"
+	"synthezia/internal/models"
 
 	"github.com/google/uuid"
 )

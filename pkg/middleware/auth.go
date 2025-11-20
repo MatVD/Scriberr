@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
-	"scriberr/internal/auth"
-	"scriberr/internal/database"
-	"scriberr/internal/models"
+	"synthezia/internal/auth"
+	"synthezia/internal/database"
+	"synthezia/internal/models"
 
 	"github.com/gin-gonic/gin"
 )

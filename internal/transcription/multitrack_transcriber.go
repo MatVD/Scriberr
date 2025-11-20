@@ -12,10 +12,10 @@ import (
 	"sync"
 	"time"
 
-	"scriberr/internal/database"
-	"scriberr/internal/models"
-	"scriberr/internal/transcription/interfaces"
-	"scriberr/pkg/logger"
+	"synthezia/internal/database"
+	"synthezia/internal/models"
+	"synthezia/internal/transcription/interfaces"
+	"synthezia/pkg/logger"
 
 	"gorm.io/gorm"
 )

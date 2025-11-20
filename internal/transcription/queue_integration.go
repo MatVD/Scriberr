@@ -4,7 +4,7 @@ import (
 	"context"
 	"os/exec"
 
-	"scriberr/pkg/logger"
+	"synthezia/pkg/logger"
 )
 
 // UnifiedJobProcessor implements the existing JobProcessor interface using the new unified service

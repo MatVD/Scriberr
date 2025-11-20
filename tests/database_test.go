@@ -4,8 +4,8 @@ import (
 	"os"
 	"testing"
 
-	"scriberr/internal/database"
-	"scriberr/internal/models"
+	"synthezia/internal/database"
+	"synthezia/internal/models"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -54,7 +54,7 @@ func (suite *DatabaseTestSuite) TestDatabaseInitialization() {
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), "Default Profile", defaultProfile.Name)
 	assert.NotNil(suite.T(), defaultProfile.Description)
-	assert.Equal(suite.T(), "base", defaultProfile.Parameters.Model)
+	assert.Equal(suite.T(), "large", defaultProfile.Parameters.Model)
 
 	// Close the test database and restore original
 	database.Close()

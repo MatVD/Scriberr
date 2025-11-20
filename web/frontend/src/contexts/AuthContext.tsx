@@ -42,7 +42,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	// Logout function
   const logout = useCallback(() => {
     setToken(null);
-    localStorage.removeItem("scriberr_auth_token");
+    localStorage.removeItem("synthezia_auth_token");
     // Call logout endpoint to invalidate token server-side (optional)
     fetch("/api/v1/auth/logout", {
       method: "POST",
@@ -76,11 +76,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 					
 					// Only check for existing token if registration is not required
                     if (!regEnabled) {
-						const savedToken = localStorage.getItem("scriberr_auth_token");
+						const savedToken = localStorage.getItem("synthezia_auth_token");
 						if (savedToken) {
 							if (isTokenExpired(savedToken)) {
 								// Token expired, remove it
-								localStorage.removeItem("scriberr_auth_token");
+								localStorage.removeItem("synthezia_auth_token");
 							} else {
 								setToken(savedToken);
 							}
@@ -90,10 +90,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 			} catch (error) {
 				console.error("Failed to check registration status:", error);
 				// If we can't check status, assume no registration needed and check token
-				const savedToken = localStorage.getItem("scriberr_auth_token");
+				const savedToken = localStorage.getItem("synthezia_auth_token");
 				if (savedToken) {
 					if (isTokenExpired(savedToken)) {
-						localStorage.removeItem("scriberr_auth_token");
+						localStorage.removeItem("synthezia_auth_token");
 					} else {
 						setToken(savedToken);
 					}
@@ -108,7 +108,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
 	const login = useCallback((newToken: string) => {
 		setToken(newToken);
-		localStorage.setItem("scriberr_auth_token", newToken);
+		localStorage.setItem("synthezia_auth_token", newToken);
 		setRequiresRegistration(false); // Clear registration requirement after successful login/registration
 	}, []);
 

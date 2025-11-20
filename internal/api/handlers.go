@@ -16,14 +16,14 @@ import (
 	"strings"
 	"time"
 
-	"scriberr/internal/auth"
-	"scriberr/internal/config"
-	"scriberr/internal/database"
-	"scriberr/internal/models"
-	"scriberr/internal/processing"
-	"scriberr/internal/queue"
-	"scriberr/internal/transcription"
-	"scriberr/pkg/logger"
+	"synthezia/internal/auth"
+	"synthezia/internal/config"
+	"synthezia/internal/database"
+	"synthezia/internal/models"
+	"synthezia/internal/processing"
+	"synthezia/internal/queue"
+	"synthezia/internal/transcription"
+	"synthezia/pkg/logger"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -1669,11 +1669,11 @@ func (h *Handler) Login(c *gin.Context) {
 // @Router /api/v1/auth/logout [post]
 func (h *Handler) Logout(c *gin.Context) {
 	// Best-effort refresh token revocation and cookie clear
-	if cookie, err := c.Cookie("scriberr_refresh_token"); err == nil {
+	if cookie, err := c.Cookie("synthezia_refresh_token"); err == nil {
 		h.revokeRefreshToken(cookie)
 	}
 	http.SetCookie(c.Writer, &http.Cookie{
-		Name:     "scriberr_refresh_token",
+		Name:     "synthezia_refresh_token",
 		Value:    "",
 		Path:     "/",
 		Expires:  time.Unix(0, 0),
@@ -1793,7 +1793,7 @@ type RefreshTokenResponse struct {
 // @Failure 401 {object} map[string]string
 // @Router /api/v1/auth/refresh [post]
 func (h *Handler) Refresh(c *gin.Context) {
-	cookie, err := c.Cookie("scriberr_refresh_token")
+	cookie, err := c.Cookie("synthezia_refresh_token")
 	if err != nil || cookie == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Missing refresh token"})
 		return
@@ -1830,7 +1830,7 @@ func (h *Handler) issueRefreshToken(c *gin.Context, userID uint) error {
 		return err
 	}
 	http.SetCookie(c.Writer, &http.Cookie{
-		Name:     "scriberr_refresh_token",
+		Name:     "synthezia_refresh_token",
 		Value:    tokenValue,
 		Path:     "/",
 		Expires:  rt.ExpiresAt,

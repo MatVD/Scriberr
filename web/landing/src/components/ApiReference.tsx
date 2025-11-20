@@ -94,7 +94,7 @@ export default function ApiReference() {
       <header className="api-topbar">
         <div className="container-narrow py-3 flex items-center justify-between gap-3">
           <a href="/" className="flex items-center gap-2 select-none min-w-0">
-            <span className="logo-font-poiret text-lg text-gray-900">Scriberr</span>
+            <span className="logo-font-poiret text-lg text-gray-900">Synthezia</span>
             <span className="text-gray-300">/</span>
             <span className="text-sm text-gray-600">API Reference</span>
           </a>
@@ -139,7 +139,7 @@ export default function ApiReference() {
         {error && <p className="text-red-600">Failed to load: {error}</p>}
 
         <div className="mb-10">
-          <h1 className="text-[28px] font-semibold tracking-tight text-gray-900">{doc?.info?.title || 'Scriberr API'}</h1>
+          <h1 className="text-[28px] font-semibold tracking-tight text-gray-900">{doc?.info?.title || 'Synthezia API'}</h1>
           <div className="mt-1 text-sm text-gray-600">Version {doc?.info?.version || '1.0.0'}</div>
           {doc && <BaseURL doc={doc} />}
         </div>

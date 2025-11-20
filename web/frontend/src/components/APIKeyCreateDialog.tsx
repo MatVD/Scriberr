@@ -103,10 +103,10 @@ export function APIKeyCreateDialog({
 		<Dialog open={open} onOpenChange={handleOpenChange}>
 			<DialogContent className="sm:max-w-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
 				<DialogHeader>
-					<DialogTitle>Create New API Key</DialogTitle>
+					<DialogTitle>Create API Key</DialogTitle>
 					<DialogDescription>
-						Create a new API key for external access to Scriberr. Give it a
-						descriptive name to help you identify it later.
+						Create a new API key for external access to SynthezIA. Give it a
+						descriptive name to identify its usage.
 					</DialogDescription>
 				</DialogHeader>
 

@@ -2,7 +2,7 @@
     "swagger": "2.0",
     "info": {
         "description": "Audio transcription service using WhisperX",
-        "title": "Scriberr API",
+        "title": "Synthezia API",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "name": "API Support",

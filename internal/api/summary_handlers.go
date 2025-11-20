@@ -7,8 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
-	"scriberr/internal/database"
-	"scriberr/internal/models"
+	"synthezia/internal/database"
+	"synthezia/internal/models"
 )
 
 type SummaryTemplateRequest struct {

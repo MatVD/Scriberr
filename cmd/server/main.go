@@ -10,16 +10,16 @@ import (
 	"syscall"
 	"time"
 
-	"scriberr/internal/api"
-	"scriberr/internal/auth"
-	"scriberr/internal/config"
-	"scriberr/internal/database"
-	"scriberr/internal/queue"
-	"scriberr/internal/transcription"
-	"scriberr/pkg/logger"
+	"synthezia/internal/api"
+	"synthezia/internal/auth"
+	"synthezia/internal/config"
+	"synthezia/internal/database"
+	"synthezia/internal/queue"
+	"synthezia/internal/transcription"
+	"synthezia/pkg/logger"
 
-	_ "scriberr/api-docs"                        // Import generated Swagger docs
-	_ "scriberr/internal/transcription/adapters" // Import adapters for auto-registration
+	_ "synthezia/api-docs"                        // Import generated Swagger docs
+	_ "synthezia/internal/transcription/adapters" // Import adapters for auto-registration
 )
 
 // Version information (set by GoReleaser)
@@ -29,7 +29,7 @@ var (
 	date    = "unknown"
 )
 
-// @title Scriberr API
+// @title SynthezIA API
 // @version 1.0
 // @description Audio transcription service using WhisperX
 // @termsOfService http://swagger.io/terms/
@@ -59,7 +59,7 @@ func main() {
 	flag.Parse()
 
 	if *showVersion {
-		fmt.Printf("Scriberr %s\n", version)
+		fmt.Printf("SynthezIA %s\n", version)
 		fmt.Printf("Commit: %s\n", commit)
 		fmt.Printf("Built: %s\n", date)
 		os.Exit(0)
@@ -67,7 +67,7 @@ func main() {
 
 	// Initialize structured logging first
 	logger.Init(os.Getenv("LOG_LEVEL"))
-	logger.Info("Starting Scriberr", "version", version)
+	logger.Info("Starting SynthezIA", "version", version)
 
 	// Load configuration
 	logger.Startup("config", "Loading configuration")
@@ -141,7 +141,7 @@ func main() {
 
 	// Give the server a moment to start
 	time.Sleep(100 * time.Millisecond)
-	logger.Info("Scriberr is ready",
+	logger.Info("SynthezIA is ready",
 		"url", fmt.Sprintf("http://%s:%s", cfg.Host, cfg.Port))
 	logger.Debug("API documentation available at /swagger/index.html")
 

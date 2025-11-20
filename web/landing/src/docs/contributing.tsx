@@ -8,7 +8,7 @@ function Contributing() {
     <DocsLayout active="contributing">
       <header>
         <h1>Contributing</h1>
-        <p className="mt-2">Thanks for your interest in improving Scriberr! Here’s how to get set up and contribute.</p>
+        <p className="mt-2">Thanks for your interest in improving Synthezia! Here’s how to get set up and contribute.</p>
       </header>
 
       <section>
@@ -50,7 +50,7 @@ function Contributing() {
         <h3 className="mt-4">Full build (embed UI)</h3>
         <p className="mt-1">Use the build script to bundle the React app and compile the Go binary with embedded assets.</p>
         <div className="bg-gray-50 rounded-lg p-4 font-mono text-sm mt-1 overflow-x-auto">
-          <pre>{`# From repo root\nchmod +x ./build.sh\n./build.sh\n\n# Run the server\n./scriberr`}</pre>
+          <pre>{`# From repo root\nchmod +x ./build.sh\n./build.sh\n\n# Run the server\n./synthezia`}</pre>
         </div>
       </section>
 

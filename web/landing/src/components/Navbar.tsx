@@ -1,4 +1,4 @@
-import { ScriberrLogo } from './ScriberrLogo';
+import { SyntheziaLogo } from './SyntheziaLogo';
 import { useState } from 'react';
 import GithubBadge from './GithubBadge';
 
@@ -8,7 +8,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur shadow-soft">
       <div className="container-narrow py-4 flex items-center justify-between">
         <a href="#" className="flex items-center gap-3">
-          <ScriberrLogo className="h-8 sm:h-10" />
+          <SyntheziaLogo className="h-8 sm:h-10" />
         </a>
         <nav className="hidden md:flex items-center gap-6 text-sm text-gray-600">
           <a href="/docs/intro.html" className="hover:text-gray-900">Docs</a>

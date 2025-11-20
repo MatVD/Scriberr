@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"scriberr/internal/database"
-	"scriberr/internal/llm"
-	"scriberr/internal/models"
+	"synthezia/internal/database"
+	"synthezia/internal/llm"
+	"synthezia/internal/models"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"

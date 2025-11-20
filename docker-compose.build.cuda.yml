@@ -1,12 +1,12 @@
 services:
-  scriberr:
-    # Build from local Dockerfile; replace with `image: ghcr.io/rishikanthc/scriberr:latest`
+  synthezia:
+    # Build from local Dockerfile; replace with `image: ghcr.io/matvd/synthezia:latest`
     # if you prefer pulling a prebuilt image.
     build:
       context: .
       dockerfile: Dockerfile.cuda
-    image: scriberr:local-cuda
-    container_name: scriberr
+    image: synthezia:local-cuda
+    container_name: synthezia
     ports:
       - "8080:8080"
     deploy:
@@ -23,15 +23,15 @@ services:
     # environment:
     #   - HOST=0.0.0.0
     #   - PORT=8080
-    #   - DATABASE_PATH=/app/data/scriberr.db
+    #   - DATABASE_PATH=/app/data/synthezia.db
     #   - UPLOAD_DIR=/app/data/uploads
       - PUID=${PUID:-10001}
       - PGID=${PGID:-10001}
     volumes:
-      - ./scriberr_data:/app/data
+      - ./synthezia_data:/app/data
       - ./env-data:/app/whisperx-env
     restart: unless-stopped
 
 volumes:
-  scriberr_data:
+  synthezia_data:
   env-data:

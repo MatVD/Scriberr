@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"scriberr/internal/models"
+	"synthezia/internal/models"
 )
 
 // ModelCapabilities describes what a model can do and its requirements

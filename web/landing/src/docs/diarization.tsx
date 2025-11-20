@@ -43,7 +43,7 @@ function DiarizationSetup() {
       </section>
 
       <div className="mt-6">
-        <Window className="w-[300px] mx-auto" src="/screenshots/scriberr-diarization-setup.png" alt="Diarization setup in Scriberr" />
+        <Window className="w-[300px] mx-auto" src="/screenshots/synthezia-diarization-setup.png" alt="Diarization setup in Synthezia" />
       </div>
     </DocsLayout>
   );

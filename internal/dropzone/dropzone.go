@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"scriberr/internal/config"
-	"scriberr/internal/database"
-	"scriberr/internal/models"
+	"synthezia/internal/config"
+	"synthezia/internal/database"
+	"synthezia/internal/models"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/google/uuid"

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🧪 Running Scriberr Backend Unit Tests"
+echo "🧪 Running Synthezia Backend Unit Tests"
 echo "======================================"
 
 # Colors for output

@@ -11,7 +11,7 @@ const items: Item[] = [
 	{
 		title: "Transcript view",
 		desc: "Minimal reading experience with timestamps with playback follow along that highlights currently playing word.",
-		img: "scriberr-transcript page.png",
+		img: "synthezia-transcript page.png",
 		bullets: [
 			"Jump from audio timestamp to corresponding word",
 			"Jump from text to corresponding audio segment",
@@ -19,15 +19,15 @@ const items: Item[] = [
 		],
 	},
 	{
-		title: "Record right in Scriberr",
+		title: "Record right in Synthezia",
 		desc: "Capture audio directly in-app and transcribe",
-		img: "scriberr-inbuilt audio recorder for directly recording and transcribing audio within the app.png",
+		img: "synthezia-inbuilt audio recorder for directly recording and transcribing audio within the app.png",
 		bullets: [],
 	},
 	{
 		title: "Summaries at a glance",
 		desc: "Turn long recordings into brief, actionable summaries you can scan in seconds.",
-		img: "scriberr-summarize transcripts.png",
+		img: "synthezia-summarize transcripts.png",
 		bullets: [
 			"Write your own custom prompts for summarization",
 			"Supports both Ollama/OpenAI (needs API Key) LLM providers",
@@ -37,7 +37,7 @@ const items: Item[] = [
 	{
 		title: "Annotate transcripts",
 		desc: "Highlight important moments, jot down concise notes, and keep insights attached to the exact timestamp.",
-		img: "scriberr-annotate transcript and take notes.png",
+		img: "synthezia-annotate transcript and take notes.png",
 		bullets: [
 			"Highlight text to add a note",
 			"Timestamped notes allow jumping to exact segment",
@@ -46,7 +46,7 @@ const items: Item[] = [
 	{
 		title: "Advanced controls",
 		desc: "Fine-tune model settings, language, and diarization for optimal results",
-		img: "scriberr-fine tune advanced transcription parameters as you see fit to improve transcription quality.png",
+		img: "synthezia-fine tune advanced transcription parameters as you see fit to improve transcription quality.png",
 		bullets: [
 			"Language hints and temperature",
 			"Diarization and VAD options",
@@ -56,13 +56,13 @@ const items: Item[] = [
 	{
 		title: "Bring your own providers",
 		desc: "Use OpenAI or local models via Ollama for summaries and chat — your keys, your choice.",
-		img: "scriberr-Ollama:openAI llm providers for chat and summarization.png",
+		img: "synthezia-Ollama:openAI llm providers for chat and summarization.png",
 		bullets: ["Works with OpenAI or Ollama"],
 	},
 	{
 		title: "Export transcripts",
 		desc: "Download your transcripts in multiple formats",
-		img: "scriberr-download-transcript-in-different-formats.png",
+		img: "synthezia-download-transcript-in-different-formats.png",
 		bullets: [
 			"Export to TXT, Markdown, JSON",
 			"Keep timestamps and speaker info",
@@ -71,13 +71,13 @@ const items: Item[] = [
 	{
 		title: "Chat with your transcript",
 		desc: "Ask questions about your recording, extract insights, and clarify details without scrubbing through audio.",
-		img: "scriberr-chat-with-your-recording-transcript.png",
+		img: "synthezia-chat-with-your-recording-transcript.png",
 		bullets: ["Works with OpenAI or Ollama"],
 	},
 	{
 		title: "API keys and REST API",
-		desc: "Manage API keys and use the full REST API to build automations or integrate Scriberr into your own applications.",
-		img: "scriberr-api-key-management.png",
+		desc: "Manage API keys and use the full REST API to build automations or integrate Synthezia into your own applications.",
+		img: "synthezia-api-key-management.png",
 		bullets: [
 			"Secure API key management",
 			"Endpoints for transcription, chat, notes and more",
@@ -86,7 +86,7 @@ const items: Item[] = [
 	{
 		title: "Transcribe YouTube videos",
 		desc: "Paste a YouTube link to transcribe the audio directly — no downloads required.",
-		img: "scriberr-youtube-video.png",
+		img: "synthezia-youtube-video.png",
 		bullets: [
 			"Grab insights from talks, podcasts and lectures",
 			"Works with summarization and notes",

@@ -1,4 +1,4 @@
-import { ScriberrLogo } from "./ScriberrLogo";
+import { SyntheziaLogo } from "./SyntheziaLogo";
 
 export default function Hero() {
 	return (
@@ -8,7 +8,7 @@ export default function Hero() {
 					Self-hosted offline audio transcription
 				</span>
 				<h1 className="headline flex justify-center mb-4">
-					<ScriberrLogo className="h-16 sm:h-20 md:h-24 lg:h-28 xl:h-32" />
+					<SyntheziaLogo className="h-16 sm:h-20 md:h-24 lg:h-28 xl:h-32" />
 				</h1>
 				<p className="subcopy mt-3 mx-auto max-w-2xl">
 					Transcribe audio locally into text - Summarize and Chat with your
@@ -43,8 +43,8 @@ export default function Hero() {
 							<span className="size-3 rounded-full bg-green-400/80" />
 						</div>
 						<img
-							src="/screenshots/scriberr-homepage.png"
-							alt="Scriberr homepage"
+							src="/screenshots/synthezia-homepage.png"
+							alt="Synthezia homepage"
 							className="w-full object-cover"
 						/>
 					</div>

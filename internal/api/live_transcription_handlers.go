@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"time"
 
-	"scriberr/internal/database"
-	"scriberr/internal/models"
-	"scriberr/internal/transcription"
+	"synthezia/internal/database"
+	"synthezia/internal/models"
+	"synthezia/internal/transcription"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"

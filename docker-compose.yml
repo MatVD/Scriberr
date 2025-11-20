@@ -1,12 +1,12 @@
 services:
-  scriberr:
-    image: ghcr.io/rishikanthc/scriberr:latest
+  synthezia:
+    image: ghcr.io/rishikanthc/synthezia:latest
     ports:
       - "8080:8080"
     volumes:
-      - scriberr_data:/app/data
+      - synthezia_data:/app/data
     restart: unless-stopped
 
 volumes:
-  scriberr_data:
+  synthezia_data:
 

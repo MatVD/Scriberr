@@ -4,11 +4,11 @@ type RepoInfo = { stargazers_count: number; forks_count: number; html_url: strin
 
 export default function GithubBadge() {
   const [info, setInfo] = useState<RepoInfo | null>(null);
-  const href = 'https://github.com/rishikanthc/scriberr';
+  const href = 'https://github.com/rishikanthc/synthezia';
 
   useEffect(() => {
     let alive = true;
-    fetch('https://api.github.com/repos/rishikanthc/scriberr', {
+    fetch('https://api.github.com/repos/rishikanthc/synthezia', {
       headers: { 'Accept': 'application/vnd.github+json' },
     })
       .then((r) => (r.ok ? r.json() : null))
@@ -18,7 +18,7 @@ export default function GithubBadge() {
           stargazers_count: j.stargazers_count ?? 0,
           forks_count: j.forks_count ?? 0,
           html_url: j.html_url ?? href,
-          full_name: j.full_name ?? 'rishikanthc/scriberr',
+          full_name: j.full_name ?? 'rishikanthc/synthezia',
         });
       })
       .catch(() => {});
@@ -28,10 +28,10 @@ export default function GithubBadge() {
   }, []);
 
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 rounded-md border border-gray-200 bg-white px-3 py-1.5 hover:bg-gray-50 transition" title="View on GitHub" aria-label="View Scriberr on GitHub">
+    <a href={href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 rounded-md border border-gray-200 bg-white px-3 py-1.5 hover:bg-gray-50 transition" title="View on GitHub" aria-label="View Synthezia on GitHub">
       <GithubMark className="size-5 text-gray-900" />
       <div className="flex flex-col leading-tight min-w-0">
-        <span className="text-sm text-gray-900 font-medium truncate">rishikanthc/scriberr</span>
+        <span className="text-sm text-gray-900 font-medium truncate">rishikanthc/synthezia</span>
         <div className="mt-0.5 inline-flex items-center gap-3 text-xs text-gray-700">
           <span className="inline-flex items-center gap-1">
             <StarIcon className="size-4" />

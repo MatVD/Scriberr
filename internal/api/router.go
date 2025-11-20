@@ -1,10 +1,10 @@
 package api
 
 import (
-	"scriberr/internal/auth"
-	"scriberr/internal/web"
-	"scriberr/pkg/logger"
-	"scriberr/pkg/middleware"
+	"synthezia/internal/auth"
+	"synthezia/internal/web"
+	"synthezia/pkg/logger"
+	"synthezia/pkg/middleware"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"

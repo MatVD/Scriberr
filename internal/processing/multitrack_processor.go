@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"scriberr/internal/audio"
-	"scriberr/internal/database"
-	"scriberr/internal/models"
-	"scriberr/pkg/logger"
+	"synthezia/internal/audio"
+	"synthezia/internal/database"
+	"synthezia/internal/models"
+	"synthezia/pkg/logger"
 
 	"gorm.io/gorm"
 )

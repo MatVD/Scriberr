@@ -11,11 +11,11 @@ import (
 	"sync"
 	"time"
 
-	"scriberr/internal/config"
-	"scriberr/internal/database"
-	"scriberr/internal/models"
-	"scriberr/internal/transcription/interfaces"
-	"scriberr/pkg/logger"
+	"synthezia/internal/config"
+	"synthezia/internal/database"
+	"synthezia/internal/models"
+	"synthezia/internal/transcription/interfaces"
+	"synthezia/pkg/logger"
 )
 
 // LiveTranscriptionService coordinates progressive/live transcription sessions.

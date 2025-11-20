@@ -8,8 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"scriberr/internal/models"
-	"scriberr/internal/transcription"
+	"synthezia/internal/models"
+	"synthezia/internal/transcription"
+	"synthezia/internal/transcription/interfaces"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -18,7 +19,7 @@ import (
 type TranscriptionServiceTestSuite struct {
 	suite.Suite
 	helper             *TestHelper
-	whisperXService    *transcription.WhisperXService
+	unifiedProcessor   *transcription.UnifiedJobProcessor
 	quickTranscription *transcription.QuickTranscriptionService
 	sampleAudioPath    string
 }
@@ -27,40 +28,45 @@ func (suite *TranscriptionServiceTestSuite) SetupSuite() {
 	suite.helper = NewTestHelper(suite.T(), "transcription_test.db")
 
 	// Initialize transcription services
-	suite.whisperXService = transcription.NewWhisperXService(suite.helper.Config)
+	suite.unifiedProcessor = transcription.NewUnifiedJobProcessor()
 	var err error
-	suite.quickTranscription, err = transcription.NewQuickTranscriptionService(suite.helper.Config, suite.whisperXService)
+	suite.quickTranscription, err = transcription.NewQuickTranscriptionService(suite.helper.Config, suite.unifiedProcessor)
 	assert.NoError(suite.T(), err)
 
-	// Set path to sample audio file
-	suite.sampleAudioPath = "/Users/richandrasekaran/Code/machy/Scriberr/samples/jfk.wav"
-
-	// Verify sample file exists
-	_, err = os.Stat(suite.sampleAudioPath)
-	assert.NoError(suite.T(), err, "Sample audio file jfk.wav should exist")
+	// Create dummy audio file for testing
+	suite.sampleAudioPath = filepath.Join(suite.helper.Config.UploadDir, "test_sample.wav")
+	f, err := os.Create(suite.sampleAudioPath)
+	if assert.NoError(suite.T(), err) {
+		// Write 2KB of dummy data
+		f.Write(make([]byte, 2048))
+		f.Close()
+	}
 }
 
 func (suite *TranscriptionServiceTestSuite) TearDownSuite() {
+	if suite.sampleAudioPath != "" {
+		os.Remove(suite.sampleAudioPath)
+	}
 	suite.helper.Cleanup()
 }
 
-// Test WhisperX service creation
-func (suite *TranscriptionServiceTestSuite) TestNewWhisperXService() {
-	service := transcription.NewWhisperXService(suite.helper.Config)
+// Test UnifiedJobProcessor creation
+func (suite *TranscriptionServiceTestSuite) TestNewUnifiedJobProcessor() {
+	service := transcription.NewUnifiedJobProcessor()
 	assert.NotNil(suite.T(), service)
 }
 
 // Test TranscriptResult structure
 func (suite *TranscriptionServiceTestSuite) TestTranscriptResultStructure() {
 	// Test JSON marshaling/unmarshaling of transcript structures
-	segment := transcription.Segment{
+	segment := interfaces.TranscriptSegment{
 		Start:   0.0,
 		End:     5.0,
 		Text:    "This is a test segment",
 		Speaker: stringPtr("SPEAKER_01"),
 	}
 
-	word := transcription.Word{
+	word := interfaces.TranscriptWord{
 		Start:   0.0,
 		End:     1.0,
 		Word:    "This",
@@ -68,10 +74,10 @@ func (suite *TranscriptionServiceTestSuite) TestTranscriptResultStructure() {
 		Speaker: stringPtr("SPEAKER_01"),
 	}
 
-	result := transcription.TranscriptResult{
-		Segments: []transcription.Segment{segment},
-		Word:     []transcription.Word{word},
-		Language: "en",
+	result := interfaces.TranscriptResult{
+		Segments:     []interfaces.TranscriptSegment{segment},
+		WordSegments: []interfaces.TranscriptWord{word},
+		Language:     "en",
 	}
 
 	// Test JSON marshaling
@@ -81,7 +87,7 @@ func (suite *TranscriptionServiceTestSuite) TestTranscriptResultStructure() {
 	assert.Contains(suite.T(), string(jsonData), "SPEAKER_01")
 
 	// Test JSON unmarshaling
-	var unmarshaled transcription.TranscriptResult
+	var unmarshaled interfaces.TranscriptResult
 	err = json.Unmarshal(jsonData, &unmarshaled)
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), "en", unmarshaled.Language)
@@ -201,7 +207,9 @@ func (suite *TranscriptionServiceTestSuite) TestAudioFileValidation() {
 	// Test file size
 	fileInfo, err := os.Stat(suite.sampleAudioPath)
 	assert.NoError(suite.T(), err)
-	assert.Greater(suite.T(), fileInfo.Size(), int64(1000), "Audio file should have reasonable size")
+	if fileInfo != nil {
+		assert.Greater(suite.T(), fileInfo.Size(), int64(1000), "Audio file should have reasonable size")
+	}
 
 	// Test with non-existent file
 	nonExistentPath := "/path/to/nonexistent/audio.wav"
@@ -434,13 +442,13 @@ func (suite *TranscriptionServiceTestSuite) TestTranscriptParsing() {
 		"language": "en"
 	}`
 
-	var result transcription.TranscriptResult
+	var result interfaces.TranscriptResult
 	err := json.Unmarshal([]byte(mockResult), &result)
 	assert.NoError(suite.T(), err)
 
 	assert.Equal(suite.T(), "en", result.Language)
 	assert.Len(suite.T(), result.Segments, 2)
-	assert.Len(suite.T(), result.Word, 2)
+	assert.Len(suite.T(), result.WordSegments, 2)
 
 	// Verify first segment
 	assert.Equal(suite.T(), 0.0, result.Segments[0].Start)
@@ -449,8 +457,8 @@ func (suite *TranscriptionServiceTestSuite) TestTranscriptParsing() {
 	assert.Equal(suite.T(), "SPEAKER_00", *result.Segments[0].Speaker)
 
 	// Verify word-level timing
-	assert.Equal(suite.T(), "And", result.Word[0].Word)
-	assert.Equal(suite.T(), 0.95, result.Word[0].Score)
+	assert.Equal(suite.T(), "And", result.WordSegments[0].Word)
+	assert.Equal(suite.T(), 0.95, result.WordSegments[0].Score)
 }
 
 // Test error handling for invalid audio files

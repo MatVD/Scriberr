@@ -262,7 +262,7 @@ export const AudioDetailView = memo(function AudioDetailView({ audioId }: AudioD
     // Persist collapsed state per transcription
     useEffect(() => {
         try {
-            const key = `scriberr.audioCollapsed.${audioId}`;
+            const key = `synthezia.audioCollapsed.${audioId}`;
             const saved = localStorage.getItem(key);
             if (saved !== null) setAudioCollapsed(saved === '1');
         } catch { 
@@ -273,7 +273,7 @@ export const AudioDetailView = memo(function AudioDetailView({ audioId }: AudioD
 
     useEffect(() => {
         try {
-            const key = `scriberr.audioCollapsed.${audioId}`;
+            const key = `synthezia.audioCollapsed.${audioId}`;
             localStorage.setItem(key, audioCollapsed ? '1' : '0');
         } catch {
             // Ignore localStorage errors

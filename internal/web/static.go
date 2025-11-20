@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"scriberr/internal/auth"
+	"synthezia/internal/auth"
 
 	"github.com/gin-gonic/gin"
 )

@@ -1,4 +1,4 @@
-module scriberr
+module synthezia
 
 go 1.24.1
 

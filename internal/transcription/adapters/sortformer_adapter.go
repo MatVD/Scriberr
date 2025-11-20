@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"scriberr/internal/transcription/interfaces"
-	"scriberr/internal/transcription/registry"
-	"scriberr/pkg/logger"
+	"synthezia/internal/transcription/interfaces"
+	"synthezia/internal/transcription/registry"
+	"synthezia/pkg/logger"
 )
 
 // SortformerAdapter implements the DiarizationAdapter interface for NVIDIA Sortformer

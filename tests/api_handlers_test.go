@@ -12,10 +12,11 @@ import (
 	"strings"
 	"testing"
 
-	"scriberr/internal/api"
-	"scriberr/internal/models"
-	"scriberr/internal/queue"
-	"scriberr/internal/transcription"
+	"synthezia/internal/api"
+	"synthezia/internal/models"
+	"synthezia/internal/queue"
+	"synthezia/internal/transcription"
+	_ "synthezia/internal/transcription/adapters" // Register adapters
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -28,7 +29,8 @@ type APIHandlerTestSuite struct {
 	router             *gin.Engine
 	handler            *api.Handler
 	taskQueue          *queue.TaskQueue
-	whisperXService    *transcription.WhisperXService
+	unifiedProcessor   *transcription.UnifiedJobProcessor
+	liveTranscriptionService *transcription.LiveTranscriptionService
 	quickTranscription *transcription.QuickTranscriptionService
 }
 
@@ -36,13 +38,17 @@ func (suite *APIHandlerTestSuite) SetupSuite() {
 	suite.helper = NewTestHelper(suite.T(), "api_handlers_test.db")
 
 	// Initialize services
-	suite.whisperXService = transcription.NewWhisperXService(suite.helper.Config)
+	suite.unifiedProcessor = transcription.NewUnifiedJobProcessor()
+	
 	var err error
-	suite.quickTranscription, err = transcription.NewQuickTranscriptionService(suite.helper.Config, suite.whisperXService)
+	suite.liveTranscriptionService, err = transcription.NewLiveTranscriptionService(suite.helper.Config, suite.unifiedProcessor.GetUnifiedService())
 	assert.NoError(suite.T(), err)
 
-	suite.taskQueue = queue.NewTaskQueue(1, suite.whisperXService)
-	suite.handler = api.NewHandler(suite.helper.Config, suite.helper.AuthService, suite.taskQueue, suite.whisperXService, suite.quickTranscription)
+	suite.quickTranscription, err = transcription.NewQuickTranscriptionService(suite.helper.Config, suite.unifiedProcessor)
+	assert.NoError(suite.T(), err)
+
+	suite.taskQueue = queue.NewTaskQueue(1, suite.unifiedProcessor)
+	suite.handler = api.NewHandler(suite.helper.Config, suite.helper.AuthService, suite.taskQueue, suite.unifiedProcessor, suite.liveTranscriptionService, suite.quickTranscription)
 
 	// Set up router
 	suite.router = api.SetupRoutes(suite.handler, suite.helper.AuthService)
@@ -310,7 +316,7 @@ func (suite *APIHandlerTestSuite) TestGetSupportedModels() {
 	assert.Contains(suite.T(), response, "models")
 	assert.Contains(suite.T(), response, "languages")
 
-	models := response["models"].([]interface{})
+	models := response["models"].(map[string]interface{})
 	languages := response["languages"].([]interface{})
 
 	assert.Greater(suite.T(), len(models), 0)
@@ -424,7 +430,7 @@ func (suite *APIHandlerTestSuite) TestGetQueueStats() {
 	assert.NoError(suite.T(), err)
 
 	assert.Contains(suite.T(), response, "queue_size")
-	assert.Contains(suite.T(), response, "workers")
+	assert.Contains(suite.T(), response, "current_workers")
 	assert.Contains(suite.T(), response, "pending_jobs")
 	assert.Contains(suite.T(), response, "processing_jobs")
 	assert.Contains(suite.T(), response, "completed_jobs")

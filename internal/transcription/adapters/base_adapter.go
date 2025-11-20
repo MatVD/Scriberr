@@ -12,8 +12,8 @@ import (
 	"sync"
 	"time"
 
-	"scriberr/internal/transcription/interfaces"
-	"scriberr/pkg/logger"
+	"synthezia/internal/transcription/interfaces"
+	"synthezia/pkg/logger"
 )
 
 // Environment readiness cache to avoid repeated expensive UV checks

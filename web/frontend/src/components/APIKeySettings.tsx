@@ -47,7 +47,7 @@ export function APIKeySettings() {
 							API Keys
 						</h3>
 						<p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-							Manage your API keys for external access to Scriberr.
+							Manage your API keys for external access to SynthezIA.
 						</p>
 					</div>
 					<Button
