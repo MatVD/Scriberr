@@ -70,35 +70,13 @@ SynthezIA is a self‑hosted offline transcription app for converting audio into
 
 ## Installation
 
-Visit the website for the full guide: https://synthezia.app/docs/installation.html
-
-### Homebrew (macOS & Linux)
-
-```bash
-brew tap rishikanthc/synthezia
-brew install synthezia
-
-# Start the server
-synthezia
-```
-
-Open http://localhost:8080 in your browser.
-
-Optional configuration via .env (sensible defaults provided):
-
-```env
-# Server
-HOST=localhost
-PORT=8080
-
-# Storage
-DATABASE_PATH=./data/synthezia.db
-UPLOAD_DIR=./data/uploads
-WHISPERX_ENV=./data/whisperx-env
-
-# Custom paths (if needed)
-UV_PATH=/custom/path/to/uv
-```
+### Clone the repo
+'''
+git clone https://github.com/MatVD/synthezia.git
+cd synthezia
+./build.sh # Build the binary
+./synthezia # Run the binary
+'''
 
 ### Docker
 
@@ -110,7 +88,7 @@ docker run -d \
   -p 8080:8080 \
   -v synthezia_data:/app/data \
   --restart unless-stopped \
-  ghcr.io/rishikanthc/synthezia:latest
+  jcvd/synthezia:latest
 ```
 
 #### Docker Compose:
@@ -119,7 +97,7 @@ docker run -d \
 version: '3.9'
 services:
   synthezia:
-    image: ghcr.io/rishikanthc/synthezia:latest
+    image: jcvd/synthezia:latest
     container_name: synthezia
     ports:
       - "8080:8080"
@@ -136,7 +114,7 @@ volumes:
 version: "3.9"
 services:
   synthezia:
-    image: ghcr.io/rishikanthc/synthezia:v1.0.4-cuda
+    image: jcvd/synthezia:v1.0.4-cuda
     ports:
       - "8080:8080"
     volumes:
