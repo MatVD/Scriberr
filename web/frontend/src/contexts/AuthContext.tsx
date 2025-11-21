@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from "react";
 import type { ReactNode } from "react";
 
@@ -135,28 +136,38 @@ export function AuthProvider({ children }: AuthProviderProps) {
 			const originalFetch = window.fetch.bind(window);
 
 			const wrappedFetch: typeof window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-				try {
-					let res = await originalFetch(input, init);
-					if (res.status === 401) {
-						// Try silent refresh once
-						const newToken = await tryRefresh()
-						if (newToken) {
-							// Retry original request with updated Authorization header if provided
-							const newInit: RequestInit | undefined = init ? { ...init } : undefined
-							if (newInit?.headers && typeof newInit.headers === 'object') {
-								(newInit.headers as any)['Authorization'] = `Bearer ${newToken}`
-							}
-							res = await originalFetch(input, newInit)
-							if (res.status !== 401) return res
-						}
-						// Still unauthorized: force logout
-						logout()
-					}
-					return res;
-				} catch (err) {
-					// Network or other errors just propagate
-					throw err;
+				// Extract URL to check for auth endpoints
+				let url = "";
+				if (typeof input === "string") {
+					url = input;
+				} else if (input instanceof URL) {
+					url = input.toString();
+				} else if (input instanceof Request) {
+					url = input.url;
 				}
+
+				// Skip interception for login and refresh endpoints to avoid infinite loops
+				if (url.includes("/api/v1/auth/login") || url.includes("/api/v1/auth/refresh")) {
+					return originalFetch(input, init);
+				}
+
+				let res = await originalFetch(input, init);
+				if (res.status === 401) {
+					// Try silent refresh once
+					const newToken = await tryRefresh()
+					if (newToken) {
+						// Retry original request with updated Authorization header if provided
+						const newInit: RequestInit | undefined = init ? { ...init } : undefined
+						if (newInit?.headers && typeof newInit.headers === 'object') {
+							(newInit.headers as Record<string, string>)['Authorization'] = `Bearer ${newToken}`
+						}
+						res = await originalFetch(input, newInit)
+						if (res.status !== 401) return res
+					}
+					// Still unauthorized: force logout
+					logout()
+				}
+				return res;
 			};
 
 			window.fetch = wrappedFetch as any;
