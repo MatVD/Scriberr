@@ -58,9 +58,9 @@ func Load() *Config {
 		UVPath:             findUVPath(),
 		WhisperXEnv:        getEnv("WHISPERX_ENV", "whisperx-env/WhisperX"),
 		
-		LLMProvider:   getEnv("LLM_PROVIDER", ""),
-		OllamaBaseURL: getEnv("OLLAMA_BASE_URL", "http://localhost:11434"),
-		OpenAIAPIKey:  getEnv("OPENAI_API_KEY", ""),
+		LLMProvider:   		getEnv("LLM_PROVIDER", ""),
+		OllamaBaseURL: 		getEnv("OLLAMA_BASE_URL", "http://localhost:11434"),
+		OpenAIAPIKey:  		getEnv("OPENAI_API_KEY", ""),
 
 		YoutubeCookiesPath: getEnv("YOUTUBE_COOKIES_PATH", ""),
 	}
