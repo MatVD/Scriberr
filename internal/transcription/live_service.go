@@ -336,16 +336,18 @@ func (s *LiveTranscriptionService) CompileFullTranscript(ctx context.Context, se
 
 		// Merge Segments
 		for _, seg := range chunkResult.Segments {
-			seg.Start += chunk.StartOffset
-			seg.End += chunk.StartOffset
-			fullResult.Segments = append(fullResult.Segments, seg)
+			adjustedSeg := seg
+			adjustedSeg.Start += chunk.StartOffset
+			adjustedSeg.End += chunk.StartOffset
+			fullResult.Segments = append(fullResult.Segments, adjustedSeg)
 		}
 
 		// Merge Words
 		for _, word := range chunkResult.WordSegments {
-			word.Start += chunk.StartOffset
-			word.End += chunk.StartOffset
-			fullResult.WordSegments = append(fullResult.WordSegments, word)
+			adjustedWord := word
+			adjustedWord.Start += chunk.StartOffset
+			adjustedWord.End += chunk.StartOffset
+			fullResult.WordSegments = append(fullResult.WordSegments, adjustedWord)
 		}
 
 		// Keep last language/model info
