@@ -314,7 +314,6 @@ func (s *LiveTranscriptionService) CompileFullTranscript(ctx context.Context, se
 	fullResult := &interfaces.TranscriptResult{
 		Metadata:     make(map[string]string),
 		Segments:     make([]interfaces.TranscriptSegment, 0),
-		WordSegments: make([]interfaces.WordSegment, 0),
 	}
 	var allText strings.Builder
 
