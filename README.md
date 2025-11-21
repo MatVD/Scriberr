@@ -71,12 +71,12 @@ SynthezIA is a self‑hosted offline transcription app for converting audio into
 ## Installation
 
 ### Clone the repo
-'''
+```bash
 git clone https://github.com/MatVD/synthezia.git
 cd synthezia
 ./build.sh # Build the binary
 ./synthezia # Run the binary
-'''
+```
 
 ### Docker
 
