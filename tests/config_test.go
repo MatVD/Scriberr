@@ -74,6 +74,8 @@ func (suite *ConfigTestSuite) TestLoadCustomEnv() {
 	os.Setenv("UPLOAD_DIR", "/custom/uploads")
 	os.Setenv("UV_PATH", "/custom/uv")
 	os.Setenv("WHISPERX_ENV", "/custom/whisperx")
+	os.Setenv("LLM_PROVIDER", "ollama")
+	os.Setenv("OLLAMA_BASE_URL", "http://custom-ollama:11434")
 	
 	cfg := config.Load()
 	
@@ -84,6 +86,8 @@ func (suite *ConfigTestSuite) TestLoadCustomEnv() {
 	assert.Equal(suite.T(), "/custom/uploads", cfg.UploadDir)
 	assert.Equal(suite.T(), "/custom/uv", cfg.UVPath)
 	assert.Equal(suite.T(), "/custom/whisperx", cfg.WhisperXEnv)
+	assert.Equal(suite.T(), "ollama", cfg.LLMProvider)
+	assert.Equal(suite.T(), "http://custom-ollama:11434", cfg.OllamaBaseURL)
 }
 
 // Test JWT secret generation when not provided
@@ -168,13 +172,16 @@ func (suite *ConfigTestSuite) TestUVPathDetection() {
 // Test Config struct fields
 func (suite *ConfigTestSuite) TestConfigStructure() {
 	cfg := &config.Config{
-		Port:         "3000",
-		Host:         "127.0.0.1",
-		DatabasePath: "/path/to/db",
-		JWTSecret:    "secret",
-		UploadDir:    "/uploads",
-		UVPath:       "/usr/bin/uv",
-		WhisperXEnv:  "/whisperx",
+		Port:          "3000",
+		Host:          "127.0.0.1",
+		DatabasePath:  "/path/to/db",
+		JWTSecret:     "secret",
+		UploadDir:     "/uploads",
+		UVPath:        "/usr/bin/uv",
+		WhisperXEnv:   "/whisperx",
+		LLMProvider:   "ollama",
+		OllamaBaseURL: "http://localhost:11434",
+		OpenAIAPIKey:  "sk-test",
 	}
 	
 	assert.Equal(suite.T(), "3000", cfg.Port)
@@ -184,6 +191,9 @@ func (suite *ConfigTestSuite) TestConfigStructure() {
 	assert.Equal(suite.T(), "/uploads", cfg.UploadDir)
 	assert.Equal(suite.T(), "/usr/bin/uv", cfg.UVPath)
 	assert.Equal(suite.T(), "/whisperx", cfg.WhisperXEnv)
+	assert.Equal(suite.T(), "ollama", cfg.LLMProvider)
+	assert.Equal(suite.T(), "http://localhost:11434", cfg.OllamaBaseURL)
+	assert.Equal(suite.T(), "sk-test", cfg.OpenAIAPIKey)
 }
 
 // Test multiple Load calls return consistent values

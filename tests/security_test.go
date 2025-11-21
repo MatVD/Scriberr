@@ -52,7 +52,7 @@ func (suite *SecurityTestSuite) SetupSuite() {
 	}
 
 	// Initialize test database
-	if err := database.Initialize(suite.config.DatabasePath); err != nil {
+	if err := database.Initialize(suite.config); err != nil {
 		suite.T().Fatal("Failed to initialize test database:", err)
 	}
 

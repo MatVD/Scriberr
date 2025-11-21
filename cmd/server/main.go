@@ -75,7 +75,7 @@ func main() {
 
 	// Initialize database
 	logger.Startup("database", "Connecting to database")
-	if err := database.Initialize(cfg.DatabasePath); err != nil {
+	if err := database.Initialize(cfg); err != nil {
 		logger.Error("Failed to connect to database", "error", err)
 		os.Exit(1)
 	}

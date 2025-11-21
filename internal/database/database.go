@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"synthezia/internal/config"
 	"synthezia/internal/models"
 
 	"github.com/glebarez/sqlite"
@@ -17,7 +18,7 @@ import (
 var DB *gorm.DB
 
 // Initialize initializes the database connection with optimized settings
-func Initialize(dbPath string) error {
+func Initialize(cfg *config.Config) error {
 	var err error
 
 	// Create database directory if it doesn't exist
@@ -34,7 +35,7 @@ func Initialize(dbPath string) error {
 		"_pragma=temp_store(MEMORY)&"+       // Store temp tables in memory
 		"_pragma=mmap_size(268435456)&"+     // 256MB mmap size
 		"_timeout=30000",                     // 30 second timeout
-		dbPath)
+		cfg.DatabasePath)
 
 	// Open database connection with optimized config
 	DB, err = gorm.Open(sqlite.Open(dsn), &gorm.Config{
@@ -88,6 +89,43 @@ func Initialize(dbPath string) error {
 	// Create default transcription profile if none exists
 	if err := ensureDefaultProfile(); err != nil {
 		return fmt.Errorf("failed to create default profile: %v", err)
+	}
+
+	// Seed LLM config from environment variables
+	if err := seedLLMConfig(cfg); err != nil {
+		return fmt.Errorf("failed to seed LLM config: %v", err)
+	}
+
+	return nil
+}
+
+// seedLLMConfig seeds the LLM configuration from environment variables if not present
+func seedLLMConfig(cfg *config.Config) error {
+	if cfg.LLMProvider == "" {
+		return nil
+	}
+
+	var count int64
+	if err := DB.Model(&models.LLMConfig{}).Count(&count).Error; err != nil {
+		return fmt.Errorf("failed to count LLM configs: %v", err)
+	}
+
+	// If no configs exist, create one from env vars
+	if count == 0 {
+		llmConfig := models.LLMConfig{
+			Provider: cfg.LLMProvider,
+			IsActive: true,
+		}
+
+		if cfg.LLMProvider == "ollama" {
+			llmConfig.BaseURL = &cfg.OllamaBaseURL
+		} else if cfg.LLMProvider == "openai" {
+			llmConfig.APIKey = &cfg.OpenAIAPIKey
+		}
+
+		if err := DB.Create(&llmConfig).Error; err != nil {
+			return fmt.Errorf("failed to create default LLM config: %v", err)
+		}
 	}
 
 	return nil

@@ -42,7 +42,7 @@ func NewTestHelper(t *testing.T, dbName string) *TestHelper {
 	}
 
 	// Initialize test database
-	if err := database.Initialize(cfg.DatabasePath); err != nil {
+	if err := database.Initialize(cfg); err != nil {
 		t.Fatal("Failed to initialize test database:", err)
 	}
 

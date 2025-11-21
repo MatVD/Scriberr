@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	"synthezia/internal/config"
 	"synthezia/internal/database"
 	"synthezia/internal/models"
 
@@ -34,7 +35,11 @@ func (suite *DatabaseTestSuite) TestDatabaseInitialization() {
 	// Store current DB to restore later
 	originalDB := database.DB
 
-	err := database.Initialize(testDbPath)
+	cfg := &config.Config{
+		DatabasePath: testDbPath,
+	}
+
+	err := database.Initialize(cfg)
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), database.DB)
 
@@ -65,9 +70,12 @@ func (suite *DatabaseTestSuite) TestDatabaseInitialization() {
 func (suite *DatabaseTestSuite) TestDatabaseInitializationInvalidPath() {
 	// Try to initialize with an invalid path (directory doesn't exist and can't be created)
 	invalidPath := "/root/nonexistent/database.db"
+	cfg := &config.Config{
+		DatabasePath: invalidPath,
+	}
 
 	// This might fail depending on permissions, but we'll test what we can
-	err := database.Initialize(invalidPath)
+	err := database.Initialize(cfg)
 	// The error might be from directory creation or database connection
 	if err != nil {
 		assert.Contains(suite.T(), err.Error(), "failed")

@@ -33,6 +33,11 @@ type Config struct {
 	UVPath      string
 	WhisperXEnv string
 
+	// LLM Configuration
+	LLMProvider   string
+	OllamaBaseURL string
+	OpenAIAPIKey  string
+
 	// YouTube configuration
 	YoutubeCookiesPath string
 }
@@ -52,6 +57,11 @@ func Load() *Config {
 		UploadDir:          getEnv("UPLOAD_DIR", "data/uploads"),
 		UVPath:             findUVPath(),
 		WhisperXEnv:        getEnv("WHISPERX_ENV", "whisperx-env/WhisperX"),
+		
+		LLMProvider:   getEnv("LLM_PROVIDER", ""),
+		OllamaBaseURL: getEnv("OLLAMA_BASE_URL", "http://localhost:11434"),
+		OpenAIAPIKey:  getEnv("OPENAI_API_KEY", ""),
+
 		YoutubeCookiesPath: getEnv("YOUTUBE_COOKIES_PATH", ""),
 	}
 }
