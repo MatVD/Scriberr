@@ -2,13 +2,11 @@ version: "3.9"
 
 services:
   synthezia:
-    # Build from local Dockerfile; replace with `image: ghcr.io/rishikanthc/synthezia:latest`
     # if you prefer pulling a prebuilt image.
     build:
       context: .
       dockerfile: Dockerfile
     image: synthezia:local
-    # image: ghcr.io/rishikanthc/synthezia:v1.0.0
     container_name: synthezia
     ports:
       - "8080:8080"
